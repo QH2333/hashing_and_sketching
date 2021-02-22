@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "*.wxml": "html",
+        "system_error": "cpp",
+        "type_traits": "cpp",
+        "xlocnum": "cpp",
+        "xtr1common": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "chrono": "cpp",
+        "unordered_map": "cpp"
+    }
+}

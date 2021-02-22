@@ -1,14 +1,16 @@
-all: test
+all: compile run
 
-test: hash_chaining.cpp libhash.a
-	gcc hash_chaining.cpp -L . -l hash -o hash_chaining
+compile: hash_chaining
+
+run:
 	./hash_chaining
 
-libhash.a: lookup3.o
-	ar -rc libhash.a lookup3.o
+hash_chaining: hash_chaining.cpp hash_map.h libhash.a
+	g++ hash_chaining.cpp -L . -l hash -o hash_chaining
 
-lookup3.o: lookup3.cpp
-	gcc -c lookup3.cpp -w
+libhash.a: lookup3.cpp
+	g++ -c lookup3.cpp -w
+	ar -rc libhash.a lookup3.o
 
 clean:
 	rm *.o
