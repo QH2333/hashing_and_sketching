@@ -8,7 +8,11 @@
                 "-g",
                 "${file}",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "${fileDirname}/${fileBasenameNoExtension}",
+                "-lpcap", 
+                "-L",
+                "${fileDirname}/../common",
+                "-lhash"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
