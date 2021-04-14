@@ -23,17 +23,14 @@
 #include <pcap.h>
 
 // Project headers
+#include "../common/common.h"
 #include "../common/pkt_headers.h"
 
 // === Control the program's behavior here ===
 constexpr bool VERBOSE = false;
 constexpr bool CONCISE_INFO = true;
-// constexpr const char *pcap_file = "/mnt/i/Project/dataset/imc192_datacenter/univ1_trace/univ1_pt1";
-constexpr const char *INPUT_FILE = "/mnt/i/Project/dataset/MAWI/202012311400.pcap";
-constexpr const char *OUTPUT_FILE = "../parsed_data/202012311400.dat";
-constexpr int MAX_PACKET_CNT = 5000; // -1 for infinite
-int packet_cnt = 0;
 // === End of behavior control section ===
+int packet_cnt = 0;
 
 void packetHandler(u_char *userData, const struct pcap_pkthdr* pkthdr, const u_char* packet);
 
@@ -62,16 +59,17 @@ int main()
     }
     pcap_freecode(&filter);
 
-    FILE *fp = fopen(OUTPUT_FILE, "wb");
+    FILE *fp = fopen(PARSED_FILE, "wb");
     // Start packet processing loop, just like live capture
-    if (pcap_loop(pcap_session, MAX_PACKET_CNT, packetHandler, (u_char*)fp) < 0)
+    printf("===== Start capturing =====\n");
+    if (pcap_loop(pcap_session, MAX_PACKET_CNT, packetHandler, (u_char *)fp) < 0)
     {
         printf("pcap_loop() failed: %s\n", pcap_geterr(pcap_session));
         exit(1);
     }
     fclose(fp);
 
-    printf("capture finished\n");
+    printf("===== Capture finished =====\n");
     pcap_close(pcap_session);
     return 0;
 }

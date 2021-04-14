@@ -19,8 +19,11 @@
 #include <map>
 #include <unordered_map>
 #include <vector>
+#include <queue>
 #include <algorithm>
 #include <functional>
+#include <chrono>
+#include <random>
 
 // C POSIX library
 #include <sys/socket.h>
@@ -28,4 +31,5 @@
 #include <netinet/in.h>
 
 // Project headers
+#include "../common/common.h"
 #include "../common/lookup3.h"

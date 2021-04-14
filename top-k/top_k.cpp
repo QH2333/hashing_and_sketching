@@ -9,97 +9,102 @@
  * 
  */
 #include "top_k.h"
+#include "flow_id.h"
+#include "topk_algorithms.h"
+#include "../common/get_memstat.h"
 
-constexpr const char *INPUT_FILE = "../data/202012311400.dat";
+// === Control the program's behavior here ===
+constexpr bool VERBOSE = true;
+// constexpr bool CONCISE_INFO = true;
+// === End of behavior control section ===
 
-class flow_id
-{
-public:
-    uint8_t id[13];
-
-public:
-    flow_id(char* _id)
-    {
-        memcpy(this->id, _id, 13);
-    }
-
-    std::string print_detail()
-    {
-        std::stringstream src_ip_stream;
-        std::stringstream dst_ip_stream;
-        std::stringstream detail_stream;
-        src_ip_stream << (int)id[0] << "." << (int)id[1] << "." << (int)id[2] << "." << (int)id[3] << ":" << ntohs(*(uint16_t*)(id + 8));
-        dst_ip_stream << (int)id[4] << "." << (int)id[5] << "." << (int)id[6] << "." << (int)id[7] << ":" << ntohs(*(uint16_t*)(id + 10));
-        if (id[12] == 0x06)
-            detail_stream << "[TCP] ";
-        else if (id[12] == 0x11)
-            detail_stream << "[UDP] ";
-        detail_stream << std::internal << std::setw(21) << src_ip_stream.str() << " - " << dst_ip_stream.str();
-        return detail_stream.str();
-    }
-};
-
-struct cmp
-{
-    bool operator()(const flow_id id1, const flow_id id2) const
-    {
-        bool is_same = true;
-        for (int i = 0; i < 13; i++)
-            if (id1.id[i] != id2.id[i])
-                is_same = false;
-        return is_same;
-    }
-};
-
-struct hash_func
-{
-    size_t operator()(const flow_id f_id) const
-    {
-        return hashlittle(f_id.id, 13, 0x12345678);
-    }
-};
-
-bool pair_compare(std::pair<const flow_id, int> &a, std::pair<const flow_id, int> &b)
-{
-    return a.second > b.second;
-}
+bool read_packets(std::vector<flow_id> &packets, int &pkt_count, const size_t rss_before_invoke);
+bool insert_packets(topk_algo_base &algo_obj, std::vector<flow_id> &packets, int &pkt_count, const size_t rss_before_invoke);
+std::vector<std::pair<flow_id, int>> query_topk(topk_algo_base &algo_obj, const size_t rss_before_invoke);
 
 int main()
 {
-    FILE* fp = fopen(INPUT_FILE, "rb");
+    std::vector<flow_id> packets;
+    int pkt_count = 0;
+
+    read_packets(packets, pkt_count, getCurrentRSS());
+    std::cout << std::endl;
+
+    exact_algo algo_obj(K);
+    // count_min_heap algo_obj(10, 100, K);
+    insert_packets(algo_obj, packets, pkt_count, getCurrentRSS());
+    std::cout << std::endl;
+
+    auto top_k_result = query_topk(algo_obj, getCurrentRSS());
+    std::cout << std::endl;
+
+    // for (auto iter = top_k_result.begin(); iter != top_k_result.end(); iter++)
+    // {
+    //     if (VERBOSE) std::cout << "[" << std::setw(5) << iter->second << "]" << iter->first.print_detail() << std::endl;
+    // }
+    // return 0;
+}
+
+
+bool read_packets(std::vector<flow_id> &packets, int &pkt_count, const size_t rss_before_invoke)
+{
+    FILE* fp = fopen(PARSED_FILE, "rb");
+    std::cout << "===== Reading from file =====" << std::endl;
     char flow_id_buf[13];
-    std::unordered_map<flow_id, int, hash_func, cmp> record;
+    auto start = std::chrono::steady_clock::now();
+    // ==========
     while (fread(flow_id_buf, 13, 1, fp))
     {
-        if (record.find(flow_id(flow_id_buf)) == record.end())
-            record.insert(std::make_pair(flow_id(flow_id_buf), 1));
-        else
-            record[flow_id(flow_id_buf)] += 1;
+        packets.push_back(flow_id(flow_id_buf));
+        pkt_count++;
     }
-
-    if (feof(fp))
-    {
-        printf("End of file.\n");
-    }
-    else
+    if (!feof(fp))
     {
         perror("Error: ");
+        fclose(fp);
         exit(-1);
     }
-
-    std::multimap<int, flow_id, std::greater<int>> sorted_record;
-    for (auto iter = record.begin(); iter != record.end(); iter++)
-    {
-        sorted_record.insert(std::make_pair(iter->second, iter->first));
-    }
-    int top_k = 1000000;
-    for (auto iter = sorted_record.begin(); iter != sorted_record.end(); iter++)
-    {
-        if (0 >= top_k--)
-            break;
-        // std::cout << "[" << std::setw(5) << iter->first << "]" << iter->second.print_detail() << std::endl;
-        std::cout << iter->first << std::endl;
-    }
+    // ==========
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end-start;
+    std::cout << "Packet count: " << pkt_count << "\n";
+    std::cout << "Time elapsed: " << elapsed_seconds.count() << " s\n";
+    std::cout << "Throughput: " << pkt_count / elapsed_seconds.count() << " pkt/s\n";
+    std::cout << "Packet memory occupation: " << (getCurrentRSS() - rss_before_invoke) / 1024 << "KB" << std::endl;
+    std::cout << "===== Reading finished =====" << std::endl;
     fclose(fp);
-    return 0;
+    return true;
+}
+
+bool insert_packets(topk_algo_base &algo_obj, std::vector<flow_id> &packets, int &pkt_count, const size_t rss_before_invoke)
+{
+    std::cout << "===== Start inserting =====" << std::endl;
+    auto start = std::chrono::steady_clock::now();
+    // ==========
+    for (auto pkt_it = packets.begin(); pkt_it != packets.end(); pkt_it++)
+    {
+        algo_obj.insert(*pkt_it);
+    }
+    // ==========
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+    std::cout << "Time elapsed: " << elapsed_seconds.count() << " s\n";
+    std::cout << "Throughput: " << pkt_count / elapsed_seconds.count() << " pkt/s\n";
+    std::cout << "Algorithm memory occupation: " << (getCurrentRSS() - rss_before_invoke) / 1024 << "KB" << std::endl;
+    std::cout << "===== Insertion finished =====" << std::endl;
+}
+
+std::vector<std::pair<flow_id, int>> query_topk(topk_algo_base &algo_obj, const size_t rss_before_invoke)
+{
+    std::cout << "===== Start querying =====" << std::endl;
+    auto start = std::chrono::steady_clock::now();
+    // ==========
+    std::vector<std::pair<flow_id, int>> top_k_result = algo_obj.query();
+    // ==========
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+    std::cout << "Time elapsed: " << elapsed_seconds.count() << " s\n";
+    std::cout << "Query memory occupation: " << (getCurrentRSS() - rss_before_invoke) / 1024 << "KB" << std::endl;
+    std::cout << "===== Query finished =====" << std::endl;
+    return top_k_result;
 }
