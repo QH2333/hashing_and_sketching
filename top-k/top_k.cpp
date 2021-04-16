@@ -8,6 +8,7 @@
  * @copyright Copyright (c) 2021
  * 
  */
+
 #include "top_k.h"
 #include "flow_id.h"
 #include "topk_algorithms.h"
@@ -38,11 +39,11 @@ int main()
     auto top_k_result = query_topk(algo_obj, getCurrentRSS());
     std::cout << std::endl;
 
-    // for (auto iter = top_k_result.begin(); iter != top_k_result.end(); iter++)
-    // {
-    //     if (VERBOSE) std::cout << "[" << std::setw(5) << iter->second << "]" << iter->first.print_detail() << std::endl;
-    // }
-    // return 0;
+    for (auto iter = top_k_result.begin(); iter != top_k_result.end(); iter++)
+    {
+        if (VERBOSE) std::cout << "[" << std::setw(5) << iter->second << "]" << iter->first.print_detail() << std::endl;
+    }
+    return 0;
 }
 
 
@@ -92,6 +93,7 @@ bool insert_packets(topk_algo_base &algo_obj, std::vector<flow_id> &packets, int
     std::cout << "Throughput: " << pkt_count / elapsed_seconds.count() << " pkt/s\n";
     std::cout << "Algorithm memory occupation: " << (getCurrentRSS() - rss_before_invoke) / 1024 << "KB" << std::endl;
     std::cout << "===== Insertion finished =====" << std::endl;
+    return true;
 }
 
 std::vector<std::pair<flow_id, int>> query_topk(topk_algo_base &algo_obj, const size_t rss_before_invoke)
@@ -100,6 +102,7 @@ std::vector<std::pair<flow_id, int>> query_topk(topk_algo_base &algo_obj, const 
     auto start = std::chrono::steady_clock::now();
     // ==========
     std::vector<std::pair<flow_id, int>> top_k_result = algo_obj.query();
+    // std::vector<std::pair<flow_id, int>> top_k_result = ((exact_algo&)algo_obj).query_ss();
     // ==========
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;

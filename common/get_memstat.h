@@ -10,6 +10,8 @@
  *          size_t peakSize    = getPeakRSS( );
  */
 
+#pragma once
+
 #if defined(_WIN32)
 #include <windows.h>
 #include <psapi.h>

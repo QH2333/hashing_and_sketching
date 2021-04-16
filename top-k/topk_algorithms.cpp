@@ -51,6 +51,19 @@ std::vector<std::pair<flow_id, int>> exact_algo::query()
     return std::vector<std::pair<flow_id, int>>(ret_val.rbegin(), ret_val.rend());
 }
 
+std::vector<std::pair<flow_id, int>> exact_algo::query_ss()
+{
+    stream_summary ss(k);
+    for (auto iter = hash_table.begin(); iter != hash_table.end(); iter++)
+    {
+        ss.insert(std::make_pair(iter->first, iter->second));
+    }
+    std::vector<std::pair<flow_id, int>> ret_val = ss.get_content_vec();
+    return std::vector<std::pair<flow_id, int>>(ret_val.rbegin(), ret_val.rend());
+}
+
+/************************************************************************************/
+
 bool count_min_heap::insert(const char* flow_id_buf)
 {
     flow_id flow_id_obj(flow_id_buf);
@@ -69,29 +82,11 @@ bool count_min_heap::insert(const flow_id flow_id_obj)
             min = sketch[i][hashed_bucket_id];
         }
     }
+    ss->update(std::make_pair(flow_id_obj, min));
 }
 
 std::vector<std::pair<flow_id, int>> count_min_heap::query()
 {
-    // std::priority_queue<std::pair<flow_id, int>, std::vector<std::pair<flow_id, int>>, std::greater<std::pair<flow_id, int>>> sorted_record;
-    // for (auto iter = record.begin(); iter != record.end(); iter++)
-    // {
-    //     if (sorted_record.size() < k)
-    //     {
-    //         sorted_record.push(std::make_pair(iter->first, iter->second));
-    //     }
-    //     else if (sorted_record.top().second < iter->second)
-    //     {
-    //         sorted_record.pop();
-    //         sorted_record.push(std::make_pair(iter->first, iter->second));
-    //     }
-    // }
-
-    std::vector<std::pair<flow_id, int>> ret_val;
-    // while (!sorted_record.empty())
-    // {
-    //     ret_val.push_back(sorted_record.top());
-    //     sorted_record.pop();
-    // }
+    std::vector<std::pair<flow_id, int>> ret_val = ss->get_content_vec();
     return std::vector<std::pair<flow_id, int>>(ret_val.rbegin(), ret_val.rend());
 }

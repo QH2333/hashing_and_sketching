@@ -13,6 +13,7 @@
 
 #include "top_k.h"
 #include "flow_id.h"
+#include "stream_summary.cpp"
 
 /**
  * @brief This is the abstract base class for all top-k algorithms.
@@ -49,6 +50,10 @@ public:
     bool insert(const char *flow_id_buf);
     bool insert(const flow_id flow_id_obj);
     std::vector<std::pair<flow_id, int>> query();
+    std::vector<std::pair<flow_id, int>> query_ss();
+    const int get_bucket_count() { return hash_table.bucket_count(); }
+    const float get_load_factor() { return hash_table.load_factor(); }
+    const float get_max_load_factor() { return hash_table.max_load_factor(); }
 };
 
 /**
@@ -63,6 +68,7 @@ private:
     int m; // m buckets in an array
     uint32_t *seeds;
     int **sketch;
+    stream_summary *ss;
 
 public:
     count_min_heap(int _d, int _m, int _k = K)
@@ -75,7 +81,12 @@ public:
         {
             seeds[i] = uint32_t(rd());
             sketch[i] = new int[m];
+            for (int j = 0; j < m; j++)
+            {
+                sketch[i][j] = 0;
+            }
         }
+        ss = new stream_summary(k);
     }
 
     ~count_min_heap()
@@ -85,6 +96,7 @@ public:
             delete[] sketch[i];
         }
         delete[] sketch;
+        delete ss;
     }
 
 public:
