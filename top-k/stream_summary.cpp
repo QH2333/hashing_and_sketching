@@ -11,6 +11,7 @@
 
 #include <utility>
 #include <unordered_map>
+#include <cassert>
 
 #include "top_k.h"
 #include "flow_id.h"
@@ -36,28 +37,29 @@ private:
     bucket psudo_head = {nullptr, nullptr, nullptr, -1};
     bucket *buk_head = &psudo_head;
     int k;
-    int curr_size = 0;
+    size_t curr_size = 0;
+    size_t curr_mem_byte = sizeof(stream_summary);
+
     std::unordered_map<flow_id, node *> node_locator;
 
 public:
     stream_summary(int _k = K) : k(_k) { }
     ~stream_summary()
     {
-        bucket *last_bucket = buk_head->next;
-        if (!last_bucket) // Empty ss
+        bucket *last_buk = buk_head->next;
+        bucket *buk_iter = last_buk->next;
+        if (!last_buk) // Empty ss
             return;
-        for (bucket *buk_iter = last_bucket->next; buk_iter; buk_iter = buk_iter->next)
+        for (buk_iter = last_buk->next; buk_iter; buk_iter = buk_iter->next)
         {
-            node *last_node = buk_iter->first;
-            if (!last_node) // Empty bucket
-                continue;
-            buk_iter->first->prev->next = nullptr; // Break the chain
-            for (node *node_iter = last_node->next; node_iter; node_iter = node_iter->next)
-            {
-                delete node_iter;
-            }
-            delete buk_iter;
+            delete_node_chain(last_buk->first);
+            delete last_buk;
+            curr_mem_byte -= sizeof(bucket);
+            last_buk = buk_iter;
         }
+        delete_node_chain(last_buk->first);
+        delete last_buk;
+        curr_mem_byte -= sizeof(bucket);
     }
 
 private:
@@ -80,6 +82,7 @@ private:
         else // start_buk->number < new_num
         {
             bucket *buk_to_insert = new bucket{node_ptr, start_buk, start_buk->next, new_num};
+            curr_mem_byte += sizeof(bucket);
             if (start_buk->next)
                 start_buk->next->prev = buk_to_insert;
             start_buk->next = buk_to_insert;
@@ -87,6 +90,23 @@ private:
             node_ptr->prev = node_ptr;
             node_ptr->buk = buk_to_insert;
         }
+        return true;
+    }
+
+    bool delete_node_chain(node* first)
+    {
+        node *last_node = first;
+        assert(last_node != nullptr); // Empty bucket should not exist
+        node *node_iter = last_node->next;
+        last_node->prev->next = nullptr; // Break the chain
+        for (node_iter = last_node->next; node_iter; node_iter = node_iter->next)
+        {
+            delete last_node;
+            curr_mem_byte -= sizeof(node);
+            last_node = node_iter;
+        }
+        delete last_node;
+        curr_mem_byte -= sizeof(node);
         return true;
     }
 
@@ -114,6 +134,7 @@ public:
                 if (buk_to_del->next)
                     buk_to_del->next->prev = buk_to_del->prev;
                 delete buk_to_del;
+                curr_mem_byte -= sizeof(bucket);
             }
             else // key is not the only node in a bucket
             {
@@ -142,6 +163,7 @@ public:
                     if (buk_to_del->next)
                         buk_to_del->next->prev = buk_to_del->prev;
                     delete buk_to_del;
+                    curr_mem_byte -= sizeof(bucket);
                 }
                 else // The target node is not the only node in the bucket
                 {
@@ -155,13 +177,17 @@ public:
                 }
                 node_locator.erase(node_to_del->id);
                 curr_size--;
+                curr_mem_byte -= sizeof(std::pair<flow_id, node *>);
                 delete node_to_del;
+                curr_mem_byte -= sizeof(node);
             }
             // Insert
             node *node_to_insert = new node{nullptr, nullptr, nullptr, kv_pair.first};
+            curr_mem_byte += sizeof(node);
             insert_from_pos(buk_head, kv_pair.second, node_to_insert);
             node_locator.insert(std::make_pair(kv_pair.first, node_to_insert));
             curr_size++;
+            curr_mem_byte += sizeof(std::pair<flow_id, node *>);
         }
         return true;
     }
@@ -208,6 +234,7 @@ public:
                 if (buk_to_del->next)
                     buk_to_del->next->prev = buk_to_del->prev;
                 delete buk_to_del;
+                curr_mem_byte -= sizeof(bucket);
             }
             else // Key is not the only node in a bucket
             {
@@ -221,6 +248,7 @@ public:
             }
             node_locator.erase(key);
             curr_size--;
+            curr_mem_byte -= sizeof(std::pair<flow_id, node *>);
             return true;
         }
         return false;
@@ -234,6 +262,11 @@ public:
     const size_t size()
     {
         return curr_size;
+    }
+
+    const size_t get_byte_size()
+    {
+        return curr_mem_byte;
     }
 
     /**

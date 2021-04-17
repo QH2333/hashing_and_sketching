@@ -31,6 +31,7 @@ public:
     virtual bool insert(const char *flow_id_buf) = 0;
     virtual bool insert(const flow_id flow_id_obj) = 0;
     virtual std::vector<std::pair<flow_id, int>> query() = 0;
+    virtual const size_t get_byte_size() = 0;
 };
 
 /**
@@ -54,10 +55,11 @@ public:
     const int get_bucket_count() { return hash_table.bucket_count(); }
     const float get_load_factor() { return hash_table.load_factor(); }
     const float get_max_load_factor() { return hash_table.max_load_factor(); }
+    const size_t get_byte_size() { return hash_table.size() * sizeof(std::pair<flow_id, int>); };
 };
 
 /**
- * @brief 
+ * @brief This class implements the Count-Min + Stream-summary algorithm for identifying top-k elements
  * 
  */
 class count_min_heap: public topk_algo_base
@@ -69,6 +71,7 @@ private:
     uint32_t *seeds;
     int **sketch;
     stream_summary *ss;
+    size_t curr_mem_byte_without_ss = sizeof(count_min_heap);
 
 public:
     count_min_heap(int _d, int _m, int _k = K)
@@ -76,6 +79,7 @@ public:
     {
         std::random_device rd;
         seeds = new uint32_t[d];
+        curr_mem_byte_without_ss += d * sizeof(uint32_t);
         sketch = new int *[d];
         for (int i = 0; i < d; i++)
         {
@@ -86,6 +90,7 @@ public:
                 sketch[i][j] = 0;
             }
         }
+        curr_mem_byte_without_ss += d * m * sizeof(int);
         ss = new stream_summary(k);
     }
 
@@ -103,4 +108,5 @@ public:
     bool insert(const char *flow_id_buf);
     bool insert(const flow_id flow_id_obj);
     std::vector<std::pair<flow_id, int>> query();
+    const size_t get_byte_size() { return curr_mem_byte_without_ss + ss->get_byte_size(); };
 };
