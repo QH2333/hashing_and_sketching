@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "memory_tracker.h"
 #include "top_k.h"
 #include "flow_id.h"
 #include "stream_summary.cpp"
@@ -20,6 +21,7 @@
  *        This class requires that all algorithms should at least implement the following functions:
  *        insert()
  *        query()
+ *        get_byte_size()
  */
 class topk_algo_base
 {
@@ -31,6 +33,7 @@ public:
     virtual bool insert(const char *flow_id_buf) = 0;
     virtual bool insert(const flow_id flow_id_obj) = 0;
     virtual std::vector<std::pair<flow_id, int>> query() = 0;
+    virtual int query_item(const flow_id key) = 0;
     virtual const size_t get_byte_size() = 0;
 };
 
@@ -42,7 +45,7 @@ class exact_algo: public topk_algo_base
 {
 private:
     int k;
-    std::unordered_map<flow_id, int> hash_table;
+    std::unordered_map<flow_id, int, std::hash<flow_id>, std::equal_to<flow_id>, allocator_mt<std::pair<flow_id, int>>> hash_table;
 
 public:
     exact_algo(int _k = K) : k(_k) { }
@@ -51,16 +54,19 @@ public:
     bool insert(const char *flow_id_buf);
     bool insert(const flow_id flow_id_obj);
     std::vector<std::pair<flow_id, int>> query();
-    std::vector<std::pair<flow_id, int>> query_ss();
+    int query_item(const flow_id key);
+    const size_t get_byte_size() { return hash_table.get_allocator().get_allocated_mem() + sizeof(exact_algo); };
+
+public:
+    std::vector<std::pair<flow_id, int>> query_ss(); // Slower than query()
     const int get_bucket_count() { return hash_table.bucket_count(); }
     const float get_load_factor() { return hash_table.load_factor(); }
     const float get_max_load_factor() { return hash_table.max_load_factor(); }
-    const size_t get_byte_size() { return hash_table.size() * sizeof(std::pair<flow_id, int>); };
 };
 
 /**
  * @brief This class implements the Count-Min + Stream-summary algorithm for identifying top-k elements
- * 
+ * TODO: change the memory tracker to allcator_mt
  */
 class count_min_heap: public topk_algo_base
 {
@@ -108,5 +114,11 @@ public:
     bool insert(const char *flow_id_buf);
     bool insert(const flow_id flow_id_obj);
     std::vector<std::pair<flow_id, int>> query();
+    int query_item(const flow_id key) { return 0; };
     const size_t get_byte_size() { return curr_mem_byte_without_ss + ss->get_byte_size(); };
+};
+
+
+class heavy_keeper: public topk_algo_base
+{
 };

@@ -51,6 +51,14 @@ std::vector<std::pair<flow_id, int>> exact_algo::query()
     return std::vector<std::pair<flow_id, int>>(ret_val.rbegin(), ret_val.rend());
 }
 
+int exact_algo::query_item(const flow_id key)
+{
+    if (hash_table.find(key) != hash_table.end())
+        return hash_table.find(key)->second;
+    else
+        return 0;
+}
+
 std::vector<std::pair<flow_id, int>> exact_algo::query_ss()
 {
     stream_summary ss(k);
