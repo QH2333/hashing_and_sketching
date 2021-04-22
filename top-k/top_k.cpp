@@ -22,10 +22,12 @@ constexpr bool VERBOSE = true;
 // #define ALGORITHM_TO_BENCH exact_algo
 // #define ALGORITHM_PARAMETER (K)
 
-#define ALGORITHM_TO_BENCH count_min_heap
-#define ALGORITHM_PARAMETER (10, 150, K)
+// #define ALGORITHM_TO_BENCH count_min_heap
+// #define ALGORITHM_PARAMETER (3, 2800, K)
 
-// constexpr bool CONCISE_INFO = true;
+#define ALGORITHM_TO_BENCH heavy_keeper
+#define ALGORITHM_PARAMETER (2, 2500, 1.08, K)
+
 // === End of behavior control section ===
 
 bool
@@ -63,7 +65,18 @@ int main()
 bool benchmarking(const std::vector<flow_id> &packets)
 {
     std::cout << "===== Benchmarking =====" << std::endl;
-    std::cout << "Algorithm           Round     Ins.Time (s)   Ins.Thp. (pkt/s)    Ins.Mem (KB)   Querying Time (s)   AAE            ARE            Precision      Recall         F1" << std::endl;
+    std::cout <<
+        "Algorithm           " // 20
+        "Round     "           // 10
+        "Ins.Time(s)    "      // 15
+        "Ins.Thp.(pkt/s)     " // 20
+        "Ins.Mem.(KB)   "      // 15
+        "Query Time(s)  "      // 15
+        "AAE       "           // 10
+        "ARE            "      // 15
+        "Precision      "      // 15
+        "Recall         "      // 15
+        "F1" << std::endl;
 
     exact_algo topk_ans_obj(K);
     std::vector<std::pair<flow_id, int>> topk_ans = calc_answer(packets, topk_ans_obj);
@@ -90,7 +103,7 @@ bool read_packets(std::vector<flow_id> &packets, const size_t rss_before_invoke)
     int pkt_count = 0;
     FILE *fp = fopen(PARSED_FILE, "rb");
     std::cout << "===== Reading from file =====" << std::endl;
-    char flow_id_buf[13];
+    uint8_t flow_id_buf[13];
     auto start = std::chrono::steady_clock::now();
     // ==========
     while (fread(flow_id_buf, 13, 1, fp))
@@ -131,7 +144,6 @@ bool insert_packets(const std::vector<flow_id> &packets, topk_algo_base &algo_ob
     std::chrono::duration<double> elapsed_seconds = end - start;
     std::cout << std::left << std::setw(15) << elapsed_seconds.count();
     std::cout << std::left << std::setw(20) << packets.size() / elapsed_seconds.count();
-    // std::cout << std::left << std::setw(15) << (getCurrentRSS() - rss_before_invoke) / 1024 << std::flush;
     std::cout << std::left << std::setw(15) << algo_obj.get_byte_size() / 1024.0 << std::flush;
     return true;
 }
@@ -144,7 +156,7 @@ std::vector<std::pair<flow_id, int>> query_topk(topk_algo_base &algo_obj)
     // ==========
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
-    std::cout << std::left << std::setw(20) << elapsed_seconds.count() << std::flush;
+    std::cout << std::left << std::setw(15) << elapsed_seconds.count() << std::flush;
     return topk_result;
 }
 
@@ -171,6 +183,7 @@ std::vector<std::pair<flow_id, int>> calc_answer(const std::vector<flow_id> &pac
 
 bool calc_metrics(const std::vector<std::pair<flow_id, int>> &result, const std::vector<std::pair<flow_id, int>> &ans, topk_algo_base &ans_obj)
 {
+    // AAE & ARE
     uint64_t absolute_error_cnt = 0;
     float relative_error_cnt = 0;
     for (auto iter = result.begin(); iter != result.end(); iter++)
@@ -182,27 +195,30 @@ bool calc_metrics(const std::vector<std::pair<flow_id, int>> &result, const std:
     float AAE = (float)absolute_error_cnt / result.size();
     float ARE = (float)relative_error_cnt / result.size();
 
-    std::unordered_map<flow_id, int> hashed_result(result.begin(), result.end());
+    // Precision = TP / (TP + FP)
+    std::unordered_map<flow_id, int> hashed_ans(ans.begin(), ans.end());
     int precision_cnt = 0;
-    for (auto iter = ans.begin(); iter != ans.end(); iter++)
+    for (auto iter = result.begin(); iter != result.end(); iter++)
     {
-        if (hashed_result.find(iter->first) != hashed_result.end())
+        if (hashed_ans.find(iter->first) != hashed_ans.end()) // How many items in the result are true top-ks?
             precision_cnt++;
     }
     float precision = (float)precision_cnt / result.size();
     
-    std::unordered_map<flow_id, int> hashed_ans(ans.begin(), ans.end());
+    // Recall = TP / (TP + FN)
+    std::unordered_map<flow_id, int> hashed_result(result.begin(), result.end());
     int recall_cnt = 0;
-    for (auto iter = result.begin(); iter != result.end(); iter++)
+    for (auto iter = ans.begin(); iter != ans.end(); iter++)
     {
-        if (hashed_ans.find(iter->first) != hashed_ans.end())
+        if (hashed_result.find(iter->first) != hashed_result.end()) // How many true top-ks are identified?
             recall_cnt++;
     }
     float recall = (float)recall_cnt / ans.size();
 
+    // F-1 measure
     float f1 = 2 * precision * recall / (precision + recall);
 
-    std::cout << std::left << std::setprecision(5) << std::setw(15) << AAE;
+    std::cout << std::left << std::setprecision(5) << std::setw(10) << AAE;
     std::cout << std::left << std::setprecision(5) << std::setw(15) << ARE;
     std::cout << std::left << std::setprecision(5) << std::setw(15) << precision;
     std::cout << std::left << std::setprecision(5) << std::setw(15) << recall;

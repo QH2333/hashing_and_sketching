@@ -8,3 +8,4 @@ data_cleaner/data_cleaner
 top-k/top_k
 top-k/result.txt
 parsed_data
+temp*

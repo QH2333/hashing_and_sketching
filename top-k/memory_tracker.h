@@ -39,14 +39,16 @@ public:
 public:
     inline T* allocate(size_t count)
     {
-        T *ptr = new T[count];
+        // T *ptr = new T[count];
+        T *ptr = (T*)malloc(count * sizeof(T));
         *curr_mem += count * sizeof(T);
         return ptr;
     }
 
     inline void deallocate(T* ptr, size_t count)
     {
-        delete[] ptr;
+        // delete[] ptr;
+        free(ptr);
         *curr_mem -= count * sizeof(T);
     }
 

@@ -19,7 +19,12 @@ public:
     uint8_t id[13];
 
 public:
-    flow_id(const char* _id)
+    flow_id()
+    {
+        memset(id, 0, 13);
+    }
+
+    flow_id(const uint8_t* _id)
     {
         memcpy(this->id, _id, 13);
     }
@@ -42,6 +47,16 @@ public:
     const uint32_t hash_with_seed(uint32_t seed) const
     {
         return hashlittle(this->id, 13, seed);
+    }
+
+    const bool is_null() const
+    {
+        for (int i = 0; i < 13; i++)
+        {
+            if (id[i] != 0)
+                return false;
+        }
+        return true;
     }
 };
 

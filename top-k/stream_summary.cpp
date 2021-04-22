@@ -47,9 +47,9 @@ public:
     ~stream_summary()
     {
         bucket *last_buk = buk_head->next;
-        bucket *buk_iter = last_buk->next;
         if (!last_buk) // Empty ss
             return;
+        bucket *buk_iter = last_buk->next;
         for (buk_iter = last_buk->next; buk_iter; buk_iter = buk_iter->next)
         {
             delete_node_chain(last_buk->first);
@@ -63,6 +63,16 @@ public:
     }
 
 private:
+    /**
+     * @brief Insert the node pointed by <node_ptr> to the bucket of <new_num>.
+     *        The insertion is based on a linear search, which begins with <start_buk>.
+     * 
+     * @param start_buk The starting point of insertion, its <number> should be equal to or less than <new_num>
+     * @param new_num The <number> of <node_ptr>
+     * @param node_ptr The node to be inserted
+     * @return true if the node is inserted successfully
+     * @return false if the <number> of <start_buk> is greater than <new_num>
+     */
     bool insert_from_pos(bucket* start_buk, int new_num, node* node_ptr)
     {
         if (start_buk->number > new_num) // Unable to insert
@@ -193,7 +203,8 @@ public:
     }
 
     /**
-     * @brief Similar to insert, but kv_pair is interpreted as (key, new_value)
+     * @brief Similar to insert, but kv_pair is interpreted as (key, new_value).
+     *        This function only allows *incremental* update
      * 
      * @param kv_pair Interpreted as (key, new_value)
      * @return true if the k-v pair is updated successfully
