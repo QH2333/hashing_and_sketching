@@ -12,12 +12,14 @@
 #include "top_k.h"
 #include "flow_id.h"
 #include "topk_algorithms.h"
+#include "bench_adapter.h"
 #include "../common/get_memstat.h"
-#define TO_STR_(x) #x
-#define TO_STR(x) TO_STR_(x)
 
 // === Control the program's behavior here ===
 constexpr bool VERBOSE = true;
+constexpr int MAX_READ_PKT = 10000000; // Userd in the top-k algo, -1 for infinite
+constexpr int REPEAT_CNT = 5;
+constexpr int K = 100;
 
 // #define ALGORITHM_TO_BENCH exact_algo
 // #define ALGORITHM_PARAMETER (K)
@@ -25,8 +27,8 @@ constexpr bool VERBOSE = true;
 // #define ALGORITHM_TO_BENCH count_min_heap
 // #define ALGORITHM_PARAMETER (3, 2800, K)
 
-#define ALGORITHM_TO_BENCH heavy_keeper
-#define ALGORITHM_PARAMETER (2, 2500, 1.08, K)
+// #define ALGORITHM_TO_BENCH heavy_keeper
+// #define ALGORITHM_PARAMETER (2, 2500, 1.08, K)
 
 // === End of behavior control section ===
 
@@ -66,10 +68,11 @@ bool benchmarking(const std::vector<flow_id> &packets)
 {
     std::cout << "===== Benchmarking =====" << std::endl;
     std::cout <<
-        "Algorithm           " // 20
+        "Algorithm      "      // 15
+        "Parameter                " // 25
         "Round     "           // 10
         "Ins.Time(s)    "      // 15
-        "Ins.Thp.(pkt/s)     " // 20
+        "Ins.Thp.(p/s)  "      // 15
         "Ins.Mem.(KB)   "      // 15
         "Query Time(s)  "      // 15
         "AAE       "           // 10
@@ -80,20 +83,32 @@ bool benchmarking(const std::vector<flow_id> &packets)
 
     exact_algo topk_ans_obj(K);
     std::vector<std::pair<flow_id, int>> topk_ans = calc_answer(packets, topk_ans_obj);
+    std::cout << std::endl;
 
-    size_t rss_before_insertion = getCurrentRSS();
-    for (int i = 0; i < REPEAT_CNT; i++)
+    topk_algo_base *algo_obj;
+    bench_adapter adapter;
+    while (adapter.read_next_algo())
     {
-        std::cout << std::left << std::setw(20) << TO_STR(ALGORITHM_TO_BENCH) << std::setw(10) << i << std::flush;
-        ALGORITHM_TO_BENCH *algo_obj = new ALGORITHM_TO_BENCH ALGORITHM_PARAMETER;
-        insert_packets(packets, *algo_obj, rss_before_insertion);
+        size_t rss_before_insertion = getCurrentRSS();
+        for (int i = 0; i < REPEAT_CNT; i++)
+        {
+            // ALGORITHM_TO_BENCH *algo_obj = new ALGORITHM_TO_BENCH ALGORITHM_PARAMETER;
+            // std::cout << std::left << std::setw(15) << TO_STR(ALGORITHM_TO_BENCH);
+            algo_obj = adapter.get_bench_algo();
+            std::cout << std::left << std::setw(15) << algo_obj->get_algo_name();
+            std::cout << std::setw(25) << algo_obj->get_parameter() << std::flush;
+            std::cout << std::setw(10) << i << std::flush;
+            insert_packets(packets, *algo_obj, rss_before_insertion);
 
-        auto topk_result = query_topk(*algo_obj);
-        calc_metrics(topk_result, topk_ans, topk_ans_obj);
+            auto topk_result = query_topk(*algo_obj);
+            calc_metrics(topk_result, topk_ans, topk_ans_obj);
 
+            std::cout << std::endl;
+            delete algo_obj;
+        }
         std::cout << std::endl;
-        delete algo_obj;
     }
+
     std::cout << "===== Benchmark finished =====" << std::endl;
     return true;
 }
@@ -143,7 +158,7 @@ bool insert_packets(const std::vector<flow_id> &packets, topk_algo_base &algo_ob
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
     std::cout << std::left << std::setw(15) << elapsed_seconds.count();
-    std::cout << std::left << std::setw(20) << packets.size() / elapsed_seconds.count();
+    std::cout << std::left << std::setw(15) << packets.size() / elapsed_seconds.count();
     std::cout << std::left << std::setw(15) << algo_obj.get_byte_size() / 1024.0 << std::flush;
     return true;
 }
@@ -171,7 +186,9 @@ void print_topk(const std::vector<std::pair<flow_id, int>> &topk_result)
 std::vector<std::pair<flow_id, int>> calc_answer(const std::vector<flow_id> &packets, topk_algo_base &ans_obj)
 {
     size_t rss_before_insertion = getCurrentRSS();
-    std::cout << std::left << std::setw(20) << "answer" << std::setw(10) << "-" << std::flush;
+    std::cout << std::left << std::setw(15) << "answer";
+    std::cout << std::setw(25) << ans_obj.get_parameter() << std::flush;
+    std::cout << std::setw(10) << "-" << std::flush;
     insert_packets(packets, ans_obj, rss_before_insertion);
 
     auto topk_ans = query_topk(ans_obj);

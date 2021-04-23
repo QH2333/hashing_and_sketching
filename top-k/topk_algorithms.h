@@ -14,7 +14,7 @@
 #include "memory_tracker.h"
 #include "top_k.h"
 #include "flow_id.h"
-#include "stream_summary.cpp"
+#include "stream_summary.h"
 
 /**
  * @brief This is the abstract base class for all top-k algorithms.
@@ -35,6 +35,8 @@ public:
     virtual std::vector<std::pair<flow_id, int>> query() = 0;
     virtual int query_item(const flow_id key) = 0;
     virtual const size_t get_byte_size() = 0;
+    virtual const std::string get_parameter() = 0;
+    virtual const std::string get_algo_name() = 0;
 };
 
 /**
@@ -48,7 +50,7 @@ private:
     std::unordered_map<flow_id, int, std::hash<flow_id>, std::equal_to<flow_id>, allocator_mt<std::pair<flow_id, int>>> hash_table;
 
 public:
-    exact_algo(int _k = K) : k(_k) { }
+    exact_algo(int _k = 100) : k(_k) { }
 
 public:
     bool insert(const uint8_t *flow_id_buf);
@@ -56,6 +58,8 @@ public:
     std::vector<std::pair<flow_id, int>> query();
     int query_item(const flow_id key);
     const size_t get_byte_size() { return hash_table.get_allocator().get_allocated_mem() + sizeof(exact_algo); };
+    const std::string get_parameter();
+    const std::string get_algo_name() { return std::string("exact_algo"); };
 
 public:
     std::vector<std::pair<flow_id, int>> query_ss(); // Slower than query()
@@ -81,7 +85,7 @@ private:
     size_t curr_mem_byte_without_ss = sizeof(count_min_heap);
 
 public:
-    count_min_heap(int _d, int _m, int _k = K)
+    count_min_heap(int _d, int _m, int _k = 100)
         : d(_d), m(_m), k(_k)
     {
         std::random_device rd;
@@ -117,6 +121,8 @@ public:
     std::vector<std::pair<flow_id, int>> query();
     int query_item(const flow_id key) { return 0; };
     const size_t get_byte_size() { return curr_mem_byte_without_ss + ss->get_byte_size(); };
+    const std::string get_parameter();
+    const std::string get_algo_name() { return std::string("CMS_heap"); };
 };
 
 
@@ -138,7 +144,7 @@ private:
     std::random_device rd;
 
 public:
-    heavy_keeper(int _d, int _w, float _b, int _k = K)
+    heavy_keeper(int _d, int _w, float _b, int _k = 100)
         : d(_d), w(_w), b(_b), k(_k)
     {
 
@@ -170,6 +176,8 @@ public:
     std::vector<std::pair<flow_id, int>> query();
     int query_item(const flow_id key);
     const size_t get_byte_size() { return fi_allocator.get_allocated_mem() + ss->get_byte_size(); };
+    const std::string get_parameter();
+    const std::string get_algo_name() { return std::string("heavy_keeper"); };
 
 public:
     bool insert_basic_ver(const flow_id flow_id_obj);

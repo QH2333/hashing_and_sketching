@@ -70,6 +70,13 @@ std::vector<std::pair<flow_id, int>> exact_algo::query_ss()
     return std::vector<std::pair<flow_id, int>>(ret_val.rbegin(), ret_val.rend());
 }
 
+const std::string exact_algo::get_parameter()
+{
+    std::stringstream parameter;
+    parameter << "k=" << k;
+    return parameter.str();
+}
+
 /************************************************************************************/
 
 bool count_min_heap::insert(const uint8_t* flow_id_buf)
@@ -97,6 +104,13 @@ std::vector<std::pair<flow_id, int>> count_min_heap::query()
 {
     std::vector<std::pair<flow_id, int>> ret_val = ss->get_content_vec();
     return std::vector<std::pair<flow_id, int>>(ret_val.rbegin(), ret_val.rend());
+}
+
+const std::string count_min_heap::get_parameter()
+{
+    std::stringstream parameter;
+    parameter << "d=" << d << ",m=" << m << ",k=" << k;
+    return parameter.str();
 }
 
 /************************************************************************************/
@@ -203,4 +217,11 @@ int heavy_keeper::query_item(const flow_id key)
             max = std::max(hk[i * w + hashed_bucket_id].second, max);
     }
     return max;
+}
+
+const std::string heavy_keeper::get_parameter()
+{
+    std::stringstream parameter;
+    parameter << "d=" << d << ",w=" << w << ",b=" << b << ",k=" << k;
+    return parameter.str();
 }

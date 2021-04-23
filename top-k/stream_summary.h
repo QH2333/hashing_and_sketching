@@ -9,6 +9,8 @@
  * 
  */
 
+#pragma once
+
 #include <utility>
 #include <unordered_map>
 #include <cassert>
@@ -43,7 +45,7 @@ private:
     std::unordered_map<flow_id, node *> node_locator;
 
 public:
-    stream_summary(int _k = K) : k(_k) { }
+    stream_summary(int _k) : k(_k) { }
     ~stream_summary()
     {
         bucket *last_buk = buk_head->next;
