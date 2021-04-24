@@ -80,39 +80,38 @@ private:
     int d; // d independent hash functions, d arrays
     int m; // m buckets in an array
     uint32_t *seeds;
-    int **sketch;
+    int *sketch;
     stream_summary *ss;
-    size_t curr_mem_byte_without_ss = sizeof(count_min_heap);
+    allocator_mt<flow_id> fi_allocator;
+    allocator_mt<flow_id>::rebind<int>::other int_allocator = allocator_mt<flow_id>::rebind<int>::other(fi_allocator);
+    allocator_mt<flow_id>::rebind<uint32_t>::other seed_allocator = allocator_mt<flow_id>::rebind<uint32_t>::other(fi_allocator);
+    allocator_mt<flow_id>::rebind<stream_summary>::other ss_allocator = allocator_mt<flow_id>::rebind<stream_summary>::other(fi_allocator);
 
 public:
     count_min_heap(int _d, int _m, int _k = 100)
         : d(_d), m(_m), k(_k)
     {
         std::random_device rd;
-        seeds = new uint32_t[d];
-        curr_mem_byte_without_ss += d * sizeof(uint32_t);
-        sketch = new int *[d];
+        seeds = seed_allocator.allocate(d);
+        sketch = int_allocator.allocate(d * m);
         for (int i = 0; i < d; i++)
         {
             seeds[i] = uint32_t(rd());
-            sketch[i] = new int[m];
-            for (int j = 0; j < m; j++)
-            {
-                sketch[i][j] = 0;
-            }
         }
-        curr_mem_byte_without_ss += d * m * sizeof(int);
-        ss = new stream_summary(k);
+        for (int i = 0; i < d * m; i++)
+        {
+            sketch[i] = 0;
+        }
+        ss = ss_allocator.allocate(1);
+        ss_allocator.construct(ss, k);
     }
 
     ~count_min_heap()
     {
-        for (int i = 0; i < d; i++)
-        {
-            delete[] sketch[i];
-        }
-        delete[] sketch;
-        delete ss;
+        seed_allocator.deallocate(seeds, d);
+        int_allocator.deallocate(sketch, d * m);
+        ss_allocator.destroy(ss);
+        ss_allocator.deallocate(ss, 1);
     }
 
 public:
@@ -120,7 +119,7 @@ public:
     bool insert(const flow_id flow_id_obj);
     std::vector<std::pair<flow_id, int>> query();
     int query_item(const flow_id key) { return 0; };
-    const size_t get_byte_size() { return curr_mem_byte_without_ss + ss->get_byte_size(); };
+    const size_t get_byte_size() { return sizeof(count_min_heap) + fi_allocator.get_allocated_mem() + ss->get_byte_size(); };
     const std::string get_parameter();
     const std::string get_algo_name() { return std::string("CMS_heap"); };
 };
@@ -165,6 +164,7 @@ public:
 
     ~heavy_keeper()
     {
+        seed_allocator.deallocate(seeds, d);
         kv_allocator.deallocate(hk, d * w);
         ss_allocator.destroy(ss);
         ss_allocator.deallocate(ss, 1);
@@ -175,7 +175,7 @@ public:
     bool insert(const flow_id flow_id_obj);
     std::vector<std::pair<flow_id, int>> query();
     int query_item(const flow_id key);
-    const size_t get_byte_size() { return fi_allocator.get_allocated_mem() + ss->get_byte_size(); };
+    const size_t get_byte_size() { return sizeof(heavy_keeper) + fi_allocator.get_allocated_mem() + ss->get_byte_size(); };
     const std::string get_parameter();
     const std::string get_algo_name() { return std::string("heavy_keeper"); };
 

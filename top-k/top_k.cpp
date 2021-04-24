@@ -36,19 +36,22 @@ bool
 read_packets(std::vector<flow_id> &packets, const size_t rss_before_invoke);
 
 bool
-insert_packets(const std::vector<flow_id> &packets, topk_algo_base &algo_obj, const size_t rss_before_invoke);
+insert_packets(const std::vector<flow_id> &packets, topk_algo_base &algo_obj, algo_performance_t &performance);
 
 std::vector<std::pair<flow_id, int>>
-query_topk(topk_algo_base &algo_obj);
+query_topk(topk_algo_base &algo_obj, algo_performance_t &performance);
 
 void
 print_topk(const std::vector<std::pair<flow_id, int>> &topk_result);
+
+void
+print_performance(std::ostream &writer, algo_performance_t performance);
 
 std::vector<std::pair<flow_id, int>>
 calc_answer(const std::vector<flow_id> &packets, topk_algo_base &ans_obj);
 
 bool
-calc_metrics(const std::vector<std::pair<flow_id, int>> &result, const std::vector<std::pair<flow_id, int>> &ans, topk_algo_base &ans_obj);
+calc_metrics(const std::vector<std::pair<flow_id, int>> &result, const std::vector<std::pair<flow_id, int>> &ans, topk_algo_base &ans_obj, algo_performance_t &performance);
 
 bool
 benchmarking(const std::vector<flow_id> &packets);
@@ -66,20 +69,23 @@ int main()
 
 bool benchmarking(const std::vector<flow_id> &packets)
 {
+    std::ofstream output_file("bench_output");
     std::cout << "===== Benchmarking =====" << std::endl;
-    std::cout <<
-        "Algorithm      "      // 15
+    std::string result_header =
+        "Algorithm      "           // 15
         "Parameter                " // 25
-        "Round     "           // 10
-        "Ins.Time(s)    "      // 15
-        "Ins.Thp.(p/s)  "      // 15
-        "Ins.Mem.(KB)   "      // 15
-        "Query Time(s)  "      // 15
-        "AAE       "           // 10
-        "ARE            "      // 15
-        "Precision      "      // 15
-        "Recall         "      // 15
-        "F1" << std::endl;
+        "Round     "                // 10
+        "Ins.Time(s)    "           // 15
+        "Ins.Thp.(p/s)  "           // 15
+        "Ins.Mem.(KB)   "           // 15
+        "Query Time(s)  "           // 15
+        "AAE       "                // 10
+        "ARE            "           // 15
+        "Precision      "           // 15
+        "Recall         "           // 15
+        "F1";
+    std::cout << result_header << std::endl;
+    output_file << result_header << std::endl;
 
     exact_algo topk_ans_obj(K);
     std::vector<std::pair<flow_id, int>> topk_ans = calc_answer(packets, topk_ans_obj);
@@ -89,23 +95,34 @@ bool benchmarking(const std::vector<flow_id> &packets)
     bench_adapter adapter;
     while (adapter.read_next_algo())
     {
-        size_t rss_before_insertion = getCurrentRSS();
+        algo_performance_stat_t performance_stat;
         for (int i = 0; i < REPEAT_CNT; i++)
         {
             // ALGORITHM_TO_BENCH *algo_obj = new ALGORITHM_TO_BENCH ALGORITHM_PARAMETER;
             // std::cout << std::left << std::setw(15) << TO_STR(ALGORITHM_TO_BENCH);
             algo_obj = adapter.get_bench_algo();
-            std::cout << std::left << std::setw(15) << algo_obj->get_algo_name();
-            std::cout << std::setw(25) << algo_obj->get_parameter() << std::flush;
-            std::cout << std::setw(10) << i << std::flush;
-            insert_packets(packets, *algo_obj, rss_before_insertion);
+            algo_performance_t performance_one_run;
+            std::stringstream algo_detail;
+            algo_detail << std::left << std::setw(15) << algo_obj->get_algo_name();
+            algo_detail << std::left << std::setw(25) << algo_obj->get_parameter();
+            performance_stat.algo_detail = algo_detail.str();
+            std::cout << std::left << performance_stat.algo_detail;
+            std::cout << std::left << std::setw(10) << i << std::flush;
 
-            auto topk_result = query_topk(*algo_obj);
-            calc_metrics(topk_result, topk_ans, topk_ans_obj);
+            insert_packets(packets, *algo_obj, performance_one_run);
+            auto topk_result = query_topk(*algo_obj, performance_one_run);
+            calc_metrics(topk_result, topk_ans, topk_ans_obj, performance_one_run);
 
+            print_performance(std::cout, performance_one_run);
             std::cout << std::endl;
+            performance_stat.put(performance_one_run);
             delete algo_obj;
         }
+        output_file << std::left << std::setw(15) << performance_stat.algo_detail;
+        output_file << std::left << std::setw(10) << performance_stat.count;
+        algo_performance_t average_performance = performance_stat.get();
+        print_performance(output_file, average_performance);
+        output_file << std::endl;
         std::cout << std::endl;
     }
 
@@ -146,7 +163,7 @@ bool read_packets(std::vector<flow_id> &packets, const size_t rss_before_invoke)
     return true;
 }
 
-bool insert_packets(const std::vector<flow_id> &packets, topk_algo_base &algo_obj, const size_t rss_before_invoke)
+bool insert_packets(const std::vector<flow_id> &packets, topk_algo_base &algo_obj, algo_performance_t &performance)
 {
     auto start = std::chrono::steady_clock::now();
     // ==========
@@ -157,13 +174,13 @@ bool insert_packets(const std::vector<flow_id> &packets, topk_algo_base &algo_ob
     // ==========
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
-    std::cout << std::left << std::setw(15) << elapsed_seconds.count();
-    std::cout << std::left << std::setw(15) << packets.size() / elapsed_seconds.count();
-    std::cout << std::left << std::setw(15) << algo_obj.get_byte_size() / 1024.0 << std::flush;
+    performance.ins_time = elapsed_seconds.count();
+    performance.ins_throughput = packets.size() / elapsed_seconds.count();
+    performance.ins_mem = algo_obj.get_byte_size() / 1024.0;
     return true;
 }
 
-std::vector<std::pair<flow_id, int>> query_topk(topk_algo_base &algo_obj)
+std::vector<std::pair<flow_id, int>> query_topk(topk_algo_base &algo_obj, algo_performance_t &performance)
 {
     auto start = std::chrono::steady_clock::now();
     // ==========
@@ -171,7 +188,7 @@ std::vector<std::pair<flow_id, int>> query_topk(topk_algo_base &algo_obj)
     // ==========
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
-    std::cout << std::left << std::setw(15) << elapsed_seconds.count() << std::flush;
+    performance.query_time = elapsed_seconds.count();
     return topk_result;
 }
 
@@ -183,22 +200,36 @@ void print_topk(const std::vector<std::pair<flow_id, int>> &topk_result)
     }
 }
 
+void print_performance(std::ostream &writer, algo_performance_t performance)
+{
+    writer << std::left << std::setw(15) << performance.ins_time;
+    writer << std::left << std::setw(15) << performance.ins_throughput;
+    writer << std::left << std::setw(15) << performance.ins_mem;
+    writer << std::left << std::setw(15) << performance.query_time;
+    writer << std::left << std::setprecision(4) << std::setw(10) << performance.AAE;
+    writer << std::left << std::setprecision(4) << std::setw(15) << performance.ARE;
+    writer << std::left << std::setprecision(5) << std::setw(15) << performance.precision;
+    writer << std::left << std::setprecision(5) << std::setw(15) << performance.recall;
+    writer << std::left << std::setprecision(5) << std::setw(15) << performance.F1;
+}
+
 std::vector<std::pair<flow_id, int>> calc_answer(const std::vector<flow_id> &packets, topk_algo_base &ans_obj)
 {
-    size_t rss_before_insertion = getCurrentRSS();
+    algo_performance_t ans_performance;
     std::cout << std::left << std::setw(15) << "answer";
-    std::cout << std::setw(25) << ans_obj.get_parameter() << std::flush;
-    std::cout << std::setw(10) << "-" << std::flush;
-    insert_packets(packets, ans_obj, rss_before_insertion);
+    std::cout << std::left << std::setw(25) << ans_obj.get_parameter() << std::flush;
+    std::cout << std::left << std::setw(10) << "-" << std::flush;
+    insert_packets(packets, ans_obj, ans_performance);
 
-    auto topk_ans = query_topk(ans_obj);
-    calc_metrics(topk_ans, topk_ans, ans_obj);
+    auto topk_ans = query_topk(ans_obj, ans_performance);
+    calc_metrics(topk_ans, topk_ans, ans_obj, ans_performance);
 
+    print_performance(std::cout, ans_performance);cd
     std::cout << std::endl;
     return topk_ans;
 }
 
-bool calc_metrics(const std::vector<std::pair<flow_id, int>> &result, const std::vector<std::pair<flow_id, int>> &ans, topk_algo_base &ans_obj)
+bool calc_metrics(const std::vector<std::pair<flow_id, int>> &result, const std::vector<std::pair<flow_id, int>> &ans, topk_algo_base &ans_obj, algo_performance_t &performance)
 {
     // AAE & ARE
     uint64_t absolute_error_cnt = 0;
@@ -233,12 +264,12 @@ bool calc_metrics(const std::vector<std::pair<flow_id, int>> &result, const std:
     float recall = (float)recall_cnt / ans.size();
 
     // F-1 measure
-    float f1 = 2 * precision * recall / (precision + recall);
+    float F1 = 2 * precision * recall / (precision + recall);
 
-    std::cout << std::left << std::setprecision(5) << std::setw(10) << AAE;
-    std::cout << std::left << std::setprecision(5) << std::setw(15) << ARE;
-    std::cout << std::left << std::setprecision(5) << std::setw(15) << precision;
-    std::cout << std::left << std::setprecision(5) << std::setw(15) << recall;
-    std::cout << std::left << std::setprecision(5) << std::setw(15) << f1 << std::flush;
+    performance.AAE = AAE;
+    performance.ARE = ARE;
+    performance.precision = precision;
+    performance.recall = recall;
+    performance.F1 = F1;
     return true;
 }

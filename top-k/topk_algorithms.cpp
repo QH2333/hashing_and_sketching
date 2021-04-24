@@ -91,10 +91,10 @@ bool count_min_heap::insert(const flow_id flow_id_obj)
     for (int i = 0; i < d; i++)
     {
         int hashed_bucket_id = flow_id_obj.hash_with_seed(seeds[i]) % m;
-        sketch[i][hashed_bucket_id]++;
-        if (min > sketch[i][hashed_bucket_id] || min < 0)
+        sketch[i * m + hashed_bucket_id]++;
+        if (min > sketch[i * m + hashed_bucket_id] || min < 0)
         {
-            min = sketch[i][hashed_bucket_id];
+            min = sketch[i * m + hashed_bucket_id];
         }
     }
     ss->update(std::make_pair(flow_id_obj, min));
