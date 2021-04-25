@@ -27,6 +27,9 @@
 #include <functional>
 #include <chrono>
 #include <random>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 // C POSIX library
 #include <sys/socket.h>
@@ -36,6 +39,10 @@
 // Project headers
 #include "../common/common.h"
 #include "../common/lookup3.h"
+#include "../common/memory_tracker.h"
+#include "../common/atomicops.h"
+#include "../common/readerwriterqueue.h"
+#include "../common/readerwritercircularbuffer.h"
 
 typedef struct algo_performance_t // Record the performance in a single run
 {

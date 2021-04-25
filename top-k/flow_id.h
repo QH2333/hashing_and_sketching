@@ -98,3 +98,5 @@ namespace std
         }
     };
 }
+
+const flow_id NULL_FLOW;

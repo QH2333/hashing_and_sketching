@@ -52,6 +52,9 @@
         "typeinfo": "cpp",
         "map": "cpp",
         "strstream": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "condition_variable": "cpp",
+        "mutex": "cpp",
+        "thread": "cpp"
     }
 }

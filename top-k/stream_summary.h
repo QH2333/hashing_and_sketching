@@ -134,6 +134,7 @@ public:
      */
     bool insert(std::pair<flow_id, int> kv_pair)
     {
+        // return true;
         if (node_locator.find(kv_pair.first) != node_locator.end()) // key already in SS
         {
             node* node_ptr = node_locator.find(kv_pair.first)->second;

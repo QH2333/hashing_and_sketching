@@ -43,6 +43,25 @@ private:
             last_line >> d >> w >> b >> k;
             algo_obj = new heavy_keeper(d, w, b, k);
         }
+        else if (algo_name == "heavy_keeper_opt")
+        {
+            int d;
+            int w;
+            float b;
+            int k;
+            last_line >> d >> w >> b >> k;
+            algo_obj = new heavy_keeper_opt(d, w, b, k);
+        }
+        else if (algo_name == "heavy_keeper_parallel")
+        {
+            int d;
+            int w;
+            float b;
+            int th_cnt;
+            int k;
+            last_line >> d >> w >> b >> th_cnt >> k;
+            algo_obj = new heavy_keeper_parallel(d, w, b, th_cnt, k);
+        }
         return algo_obj;
     }
 

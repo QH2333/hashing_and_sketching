@@ -224,7 +224,7 @@ std::vector<std::pair<flow_id, int>> calc_answer(const std::vector<flow_id> &pac
     auto topk_ans = query_topk(ans_obj, ans_performance);
     calc_metrics(topk_ans, topk_ans, ans_obj, ans_performance);
 
-    print_performance(std::cout, ans_performance);cd
+    print_performance(std::cout, ans_performance);
     std::cout << std::endl;
     return topk_ans;
 }
