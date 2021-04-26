@@ -1,4 +1,2 @@
 Algorithm      Parameter                Round     Ins.Time(s)    Ins.Thp.(p/s)  Ins.Mem.(KB)   Query Time(s)  AAE       ARE            Precision      Recall         F1
-CMS_heap       d=3,m=6000,k=100         5         2.61922        3.818e+06      80.043         9.1e-06        1900      1079           0.948          0.948          0.948          
-heavy_keeper   d=3,w=1200,b=1.08,k=100  5         4.2464         2.3556e+06     84.934         8.74e-06       0.532     3.046e-05      0.996          0.996          0.996          
-HK_parallel    3,200,1.08,tc=4,k=100    5         0.73496        1.368e+07      86.633         0.92098        2.02      8.34e-05       1              1              1              
+HK_parallel    3,200,1.08,tc=4,k=100    5         51.9529        192634         86.6578        0.00036362     7.452     0.0003012      1              1              1              

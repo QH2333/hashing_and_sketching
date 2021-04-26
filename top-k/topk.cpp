@@ -9,26 +9,15 @@
  * 
  */
 
-#include "top_k.h"
-#include "flow_id.h"
-#include "topk_algorithms.h"
-#include "bench_adapter.h"
-#include "../common/get_memstat.h"
+#include "topk.h"
 
 // === Control the program's behavior here ===
-constexpr bool VERBOSE = true;
-constexpr int MAX_READ_PKT = 10000000; // Userd in the top-k algo, -1 for infinite
+constexpr int MAX_READ_PKT = 10000000; // Used in the top-k algo, -1 for infinite
 constexpr int REPEAT_CNT = 5;
 constexpr int K = 100;
 
 // #define ALGORITHM_TO_BENCH exact_algo
 // #define ALGORITHM_PARAMETER (K)
-
-// #define ALGORITHM_TO_BENCH count_min_heap
-// #define ALGORITHM_PARAMETER (3, 2800, K)
-
-// #define ALGORITHM_TO_BENCH heavy_keeper
-// #define ALGORITHM_PARAMETER (2, 2500, 1.08, K)
 
 // === End of behavior control section ===
 
@@ -64,6 +53,13 @@ int main()
     std::cout << std::endl;
 
     benchmarking(packets);
+
+    // ****************************************************
+
+    // heavy_keeper algo_obj(3, 1200, 1.08, 100);
+    // monitor_live(MAX_READ_PKT, &algo_obj);
+    // print_topk(algo_obj.query());
+
     return 0;
 }
 

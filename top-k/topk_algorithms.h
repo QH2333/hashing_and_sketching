@@ -11,9 +11,19 @@
 
 #pragma once
 
-#include "top_k.h"
+// C/CPP standard library
+#include <cmath>
+#include <queue>
+#include <random>
+#include <thread>
+
+// Project headers
 #include "flow_id.h"
 #include "stream_summary.h"
+#include "memory_tracker.h"
+#include "../common/atomicops.h"
+#include "../common/readerwriterqueue.h"
+#include "../common/readerwritercircularbuffer.h"
 
 /**
  * @brief This is the abstract base class for all top-k algorithms.
@@ -270,7 +280,7 @@ public:
         {
             hk_array[i] = new heavy_keeper(d, w, b, k * 2 / th_cnt);
             thread_array[i] = new std::thread(heavy_keeper_parallel::thread_handler, i, hk_array, queue_array);
-            queue_array[i] = new moodycamel::BlockingReaderWriterQueue<flow_id>(100);
+            queue_array[i] = new moodycamel::BlockingReaderWriterQueue<flow_id>(10000);
         }
         dispatcher_seed = rand();
     }

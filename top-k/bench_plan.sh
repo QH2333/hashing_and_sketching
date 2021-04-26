@@ -10,13 +10,13 @@
 # count_min_heap 3 3500 100
 # count_min_heap 3 4000 100
 # count_min_heap 3 5000 100
-count_min_heap 3 6000 100
+# count_min_heap 3 6000 100
 # count_min_heap 3 7000 100
 # count_min_heap 3 8000 100
 # heavy_keeper 3 300 1.08 100
 # heavy_keeper 3 400 1.08 100
 # heavy_keeper 3 800 1.08 100
-heavy_keeper 3 1200 1.08 100
+# heavy_keeper 3 1200 1.08 100
 # heavy_keeper 3 1600 1.08 100
 # heavy_keeper 3 2000 1.08 100
 # heavy_keeper 3 2500 1.08 100

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "top_k.h"
+#include "topk.h"
 #include "topk_algorithms.h"
 
 #define EXACT  0
