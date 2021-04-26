@@ -9,3 +9,6 @@ top-k/topk
 top-k/result.txt
 parsed_data
 temp*
+input
+output
+log

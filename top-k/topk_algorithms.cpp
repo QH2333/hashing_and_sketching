@@ -11,7 +11,7 @@
 
 #include "topk_algorithms.h"
 
-bool exact_algo::insert(const flow_id flow_id_obj)
+bool exact_algo::insert(const flow_id &flow_id_obj)
 {
     if (hash_table.find(flow_id_obj) == hash_table.end())
         hash_table.insert(std::make_pair(flow_id_obj, 1));
@@ -71,7 +71,7 @@ const std::string exact_algo::get_parameter()
 
 /************************************************************************************/
 
-bool count_min_heap::insert(const flow_id flow_id_obj)
+bool count_min_heap::insert(const flow_id &flow_id_obj)
 {
     int min = -1;
     for (int i = 0; i < d; i++)
@@ -126,8 +126,9 @@ bool heavy_keeper::insert_basic_ver(const flow_id flow_id_obj)
     ss->update(std::make_pair(flow_id_obj, query_item(flow_id_obj)));
 }
 
-bool heavy_keeper::insert(const flow_id flow_id_obj) // software min version
+bool heavy_keeper::insert(const flow_id &flow_id_obj) // software min version
 {
+    const std::lock_guard<std::mutex> lock(insert_mutex);
     int first_empty_i = -1;
     int first_empty_j = -1;
     for (int i = 0; i < d; i++) // If the flow is already monitored, just update it
@@ -208,7 +209,7 @@ const std::string heavy_keeper::get_parameter()
 
 /************************************************************************************/
 
-bool heavy_keeper_opt::insert(const flow_id flow_id_obj) // software min version
+bool heavy_keeper_opt::insert(const flow_id &flow_id_obj) // software min version
 {
     int first_empty_i = -1;
     int first_empty_j = -1;
@@ -307,11 +308,27 @@ const std::string heavy_keeper_opt::get_parameter()
 
 /************************************************************************************/
 
-bool heavy_keeper_parallel::insert(const flow_id flow_id_obj)
+void heavy_keeper_parallel::thread_handler(thread_para para)
 {
-    int dispatch_dst = flow_id_obj.hash_with_seed(dispatcher_seed) % th_cnt;
-    // while (!queue_array[dispatch_dst]->try_enqueue(flow_id_obj)) {};
-    queue_array[dispatch_dst]->enqueue(flow_id_obj);
+    int th_id = para.th_id;
+    int th_cnt = para.th_cnt;
+    uint32_t dispatcher_seed = para.dispatcher_seed;
+    heavy_keeper **hk_array = para.hk_array;
+    moodycamel::BlockingConcurrentQueue<flow_id> *queue = para.queue;
+    flow_id item_to_insert;
+    while (true)
+    {
+        queue->wait_dequeue(item_to_insert);
+        int dispatch_dst = th_id;
+        if (is_equal(NULL_FLOW, item_to_insert))
+            return;
+        hk_array[dispatch_dst]->insert(item_to_insert);
+    }
+}
+
+bool heavy_keeper_parallel::insert(const flow_id &flow_id_obj)
+{
+    queue->enqueue(flow_id_obj);
 }
 
 std::vector<std::pair<flow_id, int>> heavy_keeper_parallel::query()
@@ -319,8 +336,11 @@ std::vector<std::pair<flow_id, int>> heavy_keeper_parallel::query()
     stream_summary merged_result(k);
     for (int i = 0; i < th_cnt; i++)
     {
-        queue_array[i]->enqueue(NULL_FLOW);
-        thread_array[i]->join();
+        queue->enqueue(NULL_FLOW);
+    }
+    for (int i = 0; i < th_cnt; i++)
+    {
+        if (thread_array[i]->joinable()) thread_array[i]->join();
         std::vector<std::pair<flow_id, int>> partial_result = hk_array[i]->query();
         for (auto item: partial_result)
             merged_result.insert(item);

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/style.css">
+        <title>Top-k demonstration</title>
+    </head>
+
+    <body>
+        <div id="main" class="container-sm card">
+            <div class="card-body">
+                <h2> </h2>
+                <form>
+                    <div class="form-group">
+                        <label for="agentAddress">The address of top-k detection agent</label>
+                        <input type="text" class="form-control" id="agentAddress">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="interfaceName">The interface to listen on</label>
+                        <select class="form-control" id="interfaceName">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pktCount">Number of pakcets to capture</label>
+                        <input type="text" class="form-control" id="pktCount">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="k">Size of K</label>
+                        <input type="text" class="form-control" id="k">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Start</button>
+                </form>
+            </div>
+        </div>
+    </body>
+</html>

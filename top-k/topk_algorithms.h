@@ -16,14 +16,17 @@
 #include <queue>
 #include <random>
 #include <thread>
+#include <mutex>
 
 // Project headers
 #include "flow_id.h"
 #include "stream_summary.h"
 #include "memory_tracker.h"
-#include "../common/atomicops.h"
-#include "../common/readerwriterqueue.h"
-#include "../common/readerwritercircularbuffer.h"
+#include "../common/queue/atomicops.h"
+#include "../common/queue/readerwriterqueue.h"
+#include "../common/queue/readerwritercircularbuffer.h"
+#include "../common/queue/concurrentqueue.h"
+#include "../common/queue/blockingconcurrentqueue.h"
 
 /**
  * @brief This is the abstract base class for all top-k algorithms.
@@ -40,7 +43,7 @@ public:
 
 public:
     virtual bool insert(const uint8_t *flow_id_buf) = 0;
-    virtual bool insert(const flow_id flow_id_obj) = 0;
+    virtual bool insert(const flow_id &flow_id_obj) = 0;
     virtual std::vector<std::pair<flow_id, int>> query() = 0;
     virtual int query_item(const flow_id key) = 0;
     virtual const size_t get_byte_size() = 0;
@@ -63,7 +66,7 @@ public:
 
 public:
     bool insert(const uint8_t *flow_id_buf) { flow_id flow_id_obj(flow_id_buf); return insert(flow_id_obj); }
-    bool insert(const flow_id flow_id_obj);
+    bool insert(const flow_id &flow_id_obj);
     std::vector<std::pair<flow_id, int>> query();
     int query_item(const flow_id key);
     const size_t get_byte_size() { return hash_table.get_allocator().get_allocated_mem() + sizeof(exact_algo); };
@@ -123,7 +126,7 @@ public:
 
 public:
     bool insert(const uint8_t *flow_id_buf) { flow_id flow_id_obj(flow_id_buf); return insert(flow_id_obj); }
-    bool insert(const flow_id flow_id_obj);
+    bool insert(const flow_id &flow_id_obj);
     std::vector<std::pair<flow_id, int>> query();
     int query_item(const flow_id key) { return 0; };
     const size_t get_byte_size() { return sizeof(count_min_heap) + fi_allocator.get_allocated_mem() + ss->get_byte_size(); };
@@ -148,6 +151,7 @@ private:
     allocator_mt<flow_id>::rebind<stream_summary>::other ss_allocator = allocator_mt<flow_id>::rebind<stream_summary>::other(fi_allocator);
     std::equal_to<flow_id> is_equal;
     std::random_device rd;
+    std::mutex insert_mutex;
 
 public:
     heavy_keeper(int _d, int _w, float _b, int _k = 100)
@@ -179,7 +183,7 @@ public:
 
 public:
     bool insert(const uint8_t *flow_id_buf) { flow_id flow_id_obj(flow_id_buf); return insert(flow_id_obj); }
-    bool insert(const flow_id flow_id_obj);
+    bool insert(const flow_id &flow_id_obj);
     std::vector<std::pair<flow_id, int>> query();
     int query_item(const flow_id key);
     const size_t get_byte_size() { return sizeof(heavy_keeper) + fi_allocator.get_allocated_mem() + ss->get_byte_size(); };
@@ -247,7 +251,7 @@ public:
 
 public:
     bool insert(const uint8_t *flow_id_buf) { flow_id flow_id_obj(flow_id_buf); return insert(flow_id_obj); }
-    bool insert(const flow_id flow_id_obj);
+    bool insert(const flow_id &flow_id_obj);
     std::vector<std::pair<flow_id, int>> query();
     int query_item(const flow_id key);
     const size_t get_byte_size() { return sizeof(heavy_keeper_opt) + fi_allocator.get_allocated_mem() + ss->get_byte_size() + ss_overflow->get_byte_size(); };
@@ -266,8 +270,16 @@ private:
     uint32_t dispatcher_seed;
     heavy_keeper **hk_array;
     std::thread **thread_array;
-    moodycamel::BlockingReaderWriterQueue<flow_id> **queue_array;
+    moodycamel::BlockingConcurrentQueue<flow_id> *queue;
     static std::equal_to<flow_id> is_equal;
+    struct thread_para
+    {
+        int th_id;
+        int th_cnt;
+        uint32_t dispatcher_seed;
+        heavy_keeper **hk_array;
+        moodycamel::BlockingConcurrentQueue<flow_id> *queue;
+    };
 
 public:
     heavy_keeper_parallel(int _d, int _w, float _b, int _th_cnt, int _k)
@@ -275,14 +287,15 @@ public:
     {
         hk_array = new heavy_keeper *[th_cnt];
         thread_array = new std::thread *[th_cnt];
-        queue_array = new moodycamel::BlockingReaderWriterQueue<flow_id> *[th_cnt];
+        queue = new moodycamel::BlockingConcurrentQueue<flow_id>;
+        dispatcher_seed = (uint32_t)rand();
         for (int i = 0; i < th_cnt; i++)
         {
-            hk_array[i] = new heavy_keeper(d, w, b, k * 2 / th_cnt);
-            thread_array[i] = new std::thread(heavy_keeper_parallel::thread_handler, i, hk_array, queue_array);
-            queue_array[i] = new moodycamel::BlockingReaderWriterQueue<flow_id>(10000);
+            // hk_array[i] = new heavy_keeper(d, w, b, k * 2 / th_cnt);
+            hk_array[i] = new heavy_keeper(d, w, b, k);
+            thread_para para{i, th_cnt, dispatcher_seed, hk_array, queue};
+            thread_array[i] = new std::thread(heavy_keeper_parallel::thread_handler, para);
         }
-        dispatcher_seed = rand();
     }
 
     ~heavy_keeper_parallel()
@@ -294,28 +307,31 @@ public:
         }
         delete[] hk_array;
         delete[] thread_array;
-        delete[] queue_array;
+        delete queue;
     }
 
 private:
-    static void thread_handler(int i, heavy_keeper **hk_array, moodycamel::BlockingReaderWriterQueue<flow_id> **queue_array)
-    {
-        flow_id item_to_insert;
-        while (true)
-        {
-            queue_array[i]->wait_dequeue(item_to_insert);
-            if (is_equal(NULL_FLOW, item_to_insert))
-                return;
-            hk_array[i]->insert(item_to_insert);
-        }
-    }
+    static void thread_handler(thread_para para);
 
 public:
     bool insert(const uint8_t *flow_id_buf) { flow_id flow_id_obj(flow_id_buf); return insert(flow_id_obj); }
-    bool insert(const flow_id flow_id_obj);
+    bool insert(const flow_id &flow_id_obj);
     std::vector<std::pair<flow_id, int>> query();
     int query_item(const flow_id key);
     const size_t get_byte_size();
     const std::string get_parameter();
     const std::string get_algo_name() { return std::string("HK_parallel"); };
+
+public:
+    void join_all()
+    {
+        for (int i = 0; i < th_cnt; i++)
+        {
+            queue->enqueue(NULL_FLOW);
+        }
+        for (int i = 0; i < th_cnt; i++)
+        {
+            thread_array[i]->join();
+        }
+    }
 };

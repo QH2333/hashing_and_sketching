@@ -13,6 +13,7 @@
 
 // C/CPP standard library
 #include <utility>
+#include <cstdio>
 #include <cstring>
 #include <string>
 #include <iomanip>
@@ -28,13 +29,11 @@
 #include <chrono>
 #include <random>
 
+#include <unistd.h>
+#include <signal.h>
+
 // Project headers
-#include "flow_id.h"
-#include "algo_performance.h"
-#include "topk_algorithms.h"
-#include "bench_adapter.h"
-#include "live_capture.h"
+
 #include "../common/common.h"
 #include "../common/pkt_headers.h"
 #include "../common/lookup3.h"
-#include "../common/get_memstat.h"

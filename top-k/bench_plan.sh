@@ -17,11 +17,12 @@
 # heavy_keeper 3 400 1.08 100
 # heavy_keeper 3 800 1.08 100
 # heavy_keeper 3 1200 1.08 100
-# heavy_keeper 3 1600 1.08 100
+heavy_keeper 3 1600 1.08 100
 # heavy_keeper 3 2000 1.08 100
 # heavy_keeper 3 2500 1.08 100
 # heavy_keeper_opt 3 200 1.08 100
 # heavy_keeper_opt 3 400 1.08 100
+heavy_keeper_parallel 3 200 1.08 2 100
 heavy_keeper_parallel 3 200 1.08 4 100
-# heavy_keeper_parallel 3 200 1.08 6 100
-# heavy_keeper_parallel 3 200 1.08 8 100
+heavy_keeper_parallel 3 200 1.08 6 100
+heavy_keeper_parallel 3 200 1.08 8 100
