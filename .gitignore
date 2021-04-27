@@ -8,7 +8,8 @@ data_cleaner/data_cleaner
 top-k/topk
 top-k/result.txt
 parsed_data
-temp*
+temp_*
 input
 output
 log
+__pycache__
