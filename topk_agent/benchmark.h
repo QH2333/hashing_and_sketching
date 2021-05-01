@@ -30,7 +30,7 @@
 #include "algo_performance.h"
 #include "topk_algorithms.h"
 #include "bench_adapter.h"
-#include "../common/get_memstat.h"
+#include "common/get_memstat.h"
 
 bool read_packets(std::vector<flow_id> &packets, const size_t rss_before_invoke);
 

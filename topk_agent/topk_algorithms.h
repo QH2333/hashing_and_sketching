@@ -22,11 +22,11 @@
 #include "flow_id.h"
 #include "stream_summary.h"
 #include "memory_tracker.h"
-#include "../common/queue/atomicops.h"
-#include "../common/queue/readerwriterqueue.h"
-#include "../common/queue/readerwritercircularbuffer.h"
-#include "../common/queue/concurrentqueue.h"
-#include "../common/queue/blockingconcurrentqueue.h"
+#include "common/queue/atomicops.h"
+#include "common/queue/readerwriterqueue.h"
+#include "common/queue/readerwritercircularbuffer.h"
+#include "common/queue/concurrentqueue.h"
+#include "common/queue/blockingconcurrentqueue.h"
 
 /**
  * @brief This is the abstract base class for all top-k algorithms.

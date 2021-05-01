@@ -1,6 +1,6 @@
 /**
  * @file live_capture.cpp
- * @author your name (you@domain.com)
+ * @author QH2333 (qi_an_hao@126.com)
  * @brief 
  * @version 0.1
  * @date 2021-04-26
@@ -89,7 +89,7 @@ void monitor_live(int max_pkt_cnt, topk_algo_base* algo_obj)
         printf("Your selection(1-%d): ", id);
         read_cnt = scanf("%d", &selected_id);
     }
-    strncpy(devnamebuf, if_list[selected_id].name.c_str(), 255);
+    strncpy(devnamebuf, if_list[selected_id-1].name.c_str(), 255);
     printf("Capturing %s.\n", devnamebuf);
 
     monitor_pkt_on_if(devnamebuf, max_pkt_cnt, algo_obj);

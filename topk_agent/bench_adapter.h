@@ -1,3 +1,13 @@
+/**
+ * @file bench_adapter.h
+ * @author QH2333 (qi_an_hao@126.com)
+ * @brief 
+ * @version 0.1
+ * @date 2021-04-24
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
 #pragma once
 
 #include "topk.h"

@@ -1,6 +1,6 @@
 /**
  * @file live_capture.h
- * @author your name (you@domain.com)
+ * @author QH2333 (qi_an_hao@126.com)
  * @brief 
  * @version 0.1
  * @date 2021-04-25
@@ -15,7 +15,7 @@
 #include <pcap.h>
 
 #include "topk_algorithms.h"
-#include "../common/pkt_headers.h"
+#include "common/pkt_headers.h"
 
 // === Control the program's behavior here ===
 constexpr bool VERBOSE = true;

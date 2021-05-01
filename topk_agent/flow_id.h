@@ -22,7 +22,7 @@
 #include <netinet/in.h>
 
 // Project headers
-#include "../common/lookup3.h"
+#include "common/lookup3.h"
 
 class flow_id
 {

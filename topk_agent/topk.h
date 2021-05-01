@@ -34,6 +34,6 @@
 
 // Project headers
 
-#include "../common/common.h"
-#include "../common/pkt_headers.h"
-#include "../common/lookup3.h"
+#include "common/common.h"
+#include "common/pkt_headers.h"
+#include "common/lookup3.h"

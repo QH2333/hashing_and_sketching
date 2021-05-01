@@ -11,8 +11,8 @@ run:
 	./topk > result.txt
 	less result.txt
 
-topk: $(prebuilt_obj) ../common/common.h ../common/pkt_headers.h
-	g++ -O3 $(prebuilt_obj) -L ../common/ $(linked_lib) -o topk
+topk: $(prebuilt_obj) common/common.h common/pkt_headers.h
+	g++ -O3 $(prebuilt_obj) -L common/ $(linked_lib) -o topk
 
 flow_id.o: flow_id.h flow_id.cpp
 	g++ -O3 -c flow_id.cpp -o flow_id.o
