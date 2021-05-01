@@ -49,6 +49,7 @@ public:
     virtual const size_t get_byte_size() = 0;
     virtual const std::string get_parameter() = 0;
     virtual const std::string get_algo_name() = 0;
+    virtual const size_t get_current_count() = 0;
 };
 
 /**
@@ -59,6 +60,7 @@ class exact_algo: public topk_algo_base
 {
 private:
     int k;
+    size_t curr_count = 0;
     std::unordered_map<flow_id, int, std::hash<flow_id>, std::equal_to<flow_id>, allocator_mt<std::pair<flow_id, int>>> hash_table;
 
 public:
@@ -72,6 +74,7 @@ public:
     const size_t get_byte_size() { return hash_table.get_allocator().get_allocated_mem() + sizeof(exact_algo); };
     const std::string get_parameter();
     const std::string get_algo_name() { return std::string("exact_algo"); };
+    const size_t get_current_count() { return curr_count; };
 
 public:
     std::vector<std::pair<flow_id, int>> query_ss(); // Slower than query()
@@ -92,6 +95,7 @@ private:
     uint32_t *seeds;
     int *sketch;
     stream_summary *ss;
+    size_t curr_count = 0;
     allocator_mt<flow_id> fi_allocator;
     allocator_mt<flow_id>::rebind<int>::other int_allocator = allocator_mt<flow_id>::rebind<int>::other(fi_allocator);
     allocator_mt<flow_id>::rebind<uint32_t>::other seed_allocator = allocator_mt<flow_id>::rebind<uint32_t>::other(fi_allocator);
@@ -132,6 +136,7 @@ public:
     const size_t get_byte_size() { return sizeof(count_min_heap) + fi_allocator.get_allocated_mem() + ss->get_byte_size(); };
     const std::string get_parameter();
     const std::string get_algo_name() { return std::string("CMS_heap"); };
+    const size_t get_current_count() { return curr_count; };
 };
 
 
@@ -145,6 +150,7 @@ private:
     uint32_t *seeds;
     std::pair<flow_id, int> *hk; // Main data structure of HeavyKeeper
     stream_summary *ss;
+    size_t curr_count = 0;
     allocator_mt<flow_id> fi_allocator;
     allocator_mt<flow_id>::rebind<std::pair<flow_id, int>>::other kv_allocator = allocator_mt<flow_id>::rebind<std::pair<flow_id, int>>::other(fi_allocator);
     allocator_mt<flow_id>::rebind<uint32_t>::other seed_allocator = allocator_mt<flow_id>::rebind<uint32_t>::other(fi_allocator);
@@ -189,6 +195,7 @@ public:
     const size_t get_byte_size() { return sizeof(heavy_keeper) + fi_allocator.get_allocated_mem() + ss->get_byte_size(); };
     const std::string get_parameter();
     const std::string get_algo_name() { return std::string("heavy_keeper"); };
+    const size_t get_current_count() { return curr_count; };
 
 public:
     bool insert_basic_ver(const flow_id flow_id_obj);
@@ -210,6 +217,7 @@ private:
     std::pair<flow_id, int> *hk; // Main data structure of HeavyKeeper
     stream_summary *ss;
     stream_summary *ss_overflow;
+    size_t curr_count = 0;
     allocator_mt<flow_id> fi_allocator;
     allocator_mt<flow_id>::rebind<std::pair<flow_id, int>>::other kv_allocator = allocator_mt<flow_id>::rebind<std::pair<flow_id, int>>::other(fi_allocator);
     allocator_mt<flow_id>::rebind<uint32_t>::other seed_allocator = allocator_mt<flow_id>::rebind<uint32_t>::other(fi_allocator);
@@ -257,6 +265,7 @@ public:
     const size_t get_byte_size() { return sizeof(heavy_keeper_opt) + fi_allocator.get_allocated_mem() + ss->get_byte_size() + ss_overflow->get_byte_size(); };
     const std::string get_parameter();
     const std::string get_algo_name() { return std::string("HK_opt"); };
+    const size_t get_current_count() { return curr_count; };
 };
 
 class heavy_keeper_parallel: public topk_algo_base
@@ -270,6 +279,7 @@ private:
     uint32_t dispatcher_seed;
     heavy_keeper **hk_array;
     std::thread **thread_array;
+    size_t curr_count = 0;
     moodycamel::BlockingConcurrentQueue<flow_id> *queue;
     static std::equal_to<flow_id> is_equal;
     struct thread_para
@@ -321,6 +331,7 @@ public:
     const size_t get_byte_size();
     const std::string get_parameter();
     const std::string get_algo_name() { return std::string("HK_parallel"); };
+    const size_t get_current_count() { return curr_count; };
 
 public:
     void join_all()

@@ -32,8 +32,15 @@
 #include <unistd.h>
 #include <signal.h>
 
-// Project headers
+// Third-party headers
+#include <grpcpp/server.h>
+#include <grpcpp/server_builder.h>
+#include <grpcpp/server_context.h>
 
+// Project headers
 #include "common/common.h"
 #include "common/pkt_headers.h"
 #include "common/lookup3.h"
+
+#include "tele_service.pb.h"
+#include "tele_service.grpc.pb.h"

@@ -5,55 +5,49 @@ import time
 import json
 import threading
 
+import grpc
+import tele_service_pb2
+import tele_service_pb2_grpc
 import flask
 app = flask.Flask(__name__)
 
 BASE_DIR = "/home/qh2333/hashing_and_sketching/web"
+RPC_PROTOCOL_VER = "0.1"
+AGENT_ADDR = 'localhost:50051'
 
 def get_if_list():
-    os.chdir(BASE_DIR)
-    if_list = []
-    with open("input", "w") as f:
-        f.write("getiflist")
+    ret_val = []
+    with grpc.insecure_channel(AGENT_ADDR) as channel:
+        stub = tele_service_pb2_grpc.tele_serviceStub(channel)
+        request = tele_service_pb2.empty_request(protocol_version=RPC_PROTOCOL_VER)
+        response = stub.get_if_list(request)
+        for entry in response.interface_list:
+            ret_val.append([entry.if_name, entry.if_description])
+    return ret_val
 
-    os.system("../top-k/topk -f")
+def run_capture(if_name, pkt_cnt, k):
+    with grpc.insecure_channel(AGENT_ADDR) as channel:
+        stub = tele_service_pb2_grpc.tele_serviceStub(channel)
+        request = tele_service_pb2.run_cap_request(protocol_version=RPC_PROTOCOL_VER, if_name=if_name, pkt_count=pkt_cnt, k=k)
+        response = stub.run_capture(request)
+        return response.is_started
 
-    with open("output", "r") as f:
-        lines = f.readlines()
-        for line in lines:
-            if_list.append(line.split("\t"))
-    
-    return if_list
+def get_cap_status():
+    with grpc.insecure_channel(AGENT_ADDR) as channel:
+        stub = tele_service_pb2_grpc.tele_serviceStub(channel)
+        request = tele_service_pb2.empty_request(protocol_version=RPC_PROTOCOL_VER)
+        response = stub.get_cap_status(request)
+        return {"is_finished": response.is_finished, "captured_pkt_count": response.captured_pkt_count}
 
-def start_monitor_pkt_on_if(if_name, pkt_cnt, k):
-    os.chdir(BASE_DIR)
-    with open("input", "w") as f:
-        f.write("capture\n%s %s %s" % (if_name, pkt_cnt, k))
-    if os.path.exists("log"):
-        os.system("rm log")
-    t1 = threading.Thread(target = lambda : os.system("../top-k/topk -f"))
-    t1.start()
-
-def is_finished():
-    os.chdir(BASE_DIR)
-    if not os.path.exists("log"):
-        return False
-    with open("log", "r") as f:
-        lines = f.readlines()
-        if lines[-1] == "Done":
-            return True
-        else:
-            return False
-
-def get_result():
-    os.chdir(BASE_DIR)
-    result_list = []
-    with open("output", "r") as f:
-        lines = f.readlines()
-        for line in lines:
-            result_list.append(line.strip().split("\t"))
-    
-    return result_list
+def get_topk_result():
+    ret_val = []
+    with grpc.insecure_channel(AGENT_ADDR) as channel:
+        stub = tele_service_pb2_grpc.tele_serviceStub(channel)
+        request = tele_service_pb2.empty_request(protocol_version=RPC_PROTOCOL_VER)
+        response = stub.get_topk_result(request)
+        for entry in response.topk_results:
+            ret_val.append([entry.id, entry.flow_description, entry.flow_count])
+    return ret_val
 
 @app.route('/')
 def serve_main():
@@ -61,33 +55,37 @@ def serve_main():
 
 @app.route('/getiflist')
 def serve_getiflist():
+    global AGENT_ADDR
+    agent_addr = flask.request.args.get("agentAddress")
+    AGENT_ADDR = agent_addr
     return json.dumps(get_if_list())
 
 @app.route('/run_capture', methods = ["POST", "GET"])
 def serve_run_capture():
     if_name = flask.request.args.get("ifname")
-    pkt_cnt = flask.request.args.get("pktCount")
-    k = flask.request.args.get("k")
-    print([if_name, pkt_cnt, k])
-    start_monitor_pkt_on_if(if_name, pkt_cnt, k)
-    return "success"
+    pkt_cnt = int(flask.request.args.get("pktCount"))
+    k = int(flask.request.args.get("k"))
+    is_started = run_capture(if_name, pkt_cnt, k)
+    if is_started:
+        return "success"
+    else:
+        return "fail"
 
 @app.route('/get_progress', methods = ["POST", "GET"])
 def serve_get_progress():
-    with open("log", "r") as f:
-        return f.readlines()[-1].strip()
+    status = get_cap_status()
+    if status["is_finished"]:
+        return "Done"
+    else:
+        return str(status["captured_pkt_count"])
 
 @app.route('/get_result', methods = ["POST", "GET"])
 def serve_get_result():
-    if is_finished():
-        return json.dumps(get_result())
-    else:
-        return "fail"
-    return "success"
+    return json.dumps(get_topk_result())
 
 if __name__ == "__main__":
     print(get_if_list())
-    start_monitor_pkt_on_if("eth0", 100, 10)
-    while not is_finished():
-        time.sleep(0.1)
-    print(get_result())
+    print(run_capture("eth0", 100, 10))
+    while not get_cap_status():
+        time.sleep(0.5)
+    print(get_topk_result())

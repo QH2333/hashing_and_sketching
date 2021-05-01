@@ -1,20 +1,26 @@
 // Get interface list
 $(document).ready(function() {
-    var htmlobj = $.ajax({url: "/getiflist", async: false});
-    var iflist = JSON.parse(htmlobj.responseText);
-    for (var interface_info of iflist) {
-        $("#interfaceName").append("<option>" + interface_info[0] + "</option>");
-    }
+
 });
 
 var timer;
 var current_query_para;
 
+$("#updateInterface").click(function () {
+    var agent_addr = document.forms["topkQueryPlan"]["agentAddress"].value;
+    var htmlobj = $.ajax({ url: "/getiflist", data: {agentAddress: agent_addr}, async: false});
+    var iflist = JSON.parse(htmlobj.responseText);
+    $("#interfaceName").children().remove();
+    for (var interface_info of iflist) {
+        $("#interfaceName").append("<option>" + interface_info[0] + "</option>");
+    }
+});
+
 // Post capture parameters
 $("#topkStart").click(function() {
-    ifname = document.forms["topkQueryPlan"]["interfaceName"].value;
-    pktCount = document.forms["topkQueryPlan"]["pktCount"].value;
-    k = document.forms["topkQueryPlan"]["k"].value;
+    var ifname = document.forms["topkQueryPlan"]["interfaceName"].value;
+    var pktCount = document.forms["topkQueryPlan"]["pktCount"].value;
+    var k = document.forms["topkQueryPlan"]["k"].value;
     current_query_para = {ifname: ifname, pktCount: pktCount, k: k};
     $.ajax({
         type: "GET", 
@@ -23,8 +29,7 @@ $("#topkStart").click(function() {
         success: function(result) {
             $("#result").removeAttr("hidden");
             $("#capture-progress").attr("style", "width: 0%");
-            $("#result-table tbody").remove();
-            $("#result-table").append("<tbody> </tbody>");
+            $("#result-table tbody").children().remove();
             timer = setInterval(check_progress, 1000)
             console.log(result);
         }
@@ -55,10 +60,8 @@ function get_result() {
         success: function(result) {
             var topk_list = JSON.parse(result);
             console.log(topk_list);
-            var i = 1;
             for (var entry of topk_list) {
-                $("#result-table tbody").append('<tr> <th scope="row">' + i + '</th> <td>' + entry[0] + '</td> <td>' + entry[1] + '</td> </tr>');
-                i++
+                $("#result-table tbody").append('<tr> <th scope="row">' + entry[0] + '</th> <td>' + entry[1] + '</td> <td>' + entry[2] + '</td> </tr>');
             }
             $("#result-table").removeAttr("hidden");
         }

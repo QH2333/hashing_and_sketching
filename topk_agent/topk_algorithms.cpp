@@ -17,6 +17,8 @@ bool exact_algo::insert(const flow_id &flow_id_obj)
         hash_table.insert(std::make_pair(flow_id_obj, 1));
     else
         hash_table[flow_id_obj] += 1;
+    curr_count++;
+    return true;
 }
 
 std::vector<std::pair<flow_id, int>> exact_algo::query()
@@ -84,6 +86,8 @@ bool count_min_heap::insert(const flow_id &flow_id_obj)
         }
     }
     ss->update(std::make_pair(flow_id_obj, min));
+    curr_count++;
+    return true;
 }
 
 std::vector<std::pair<flow_id, int>> count_min_heap::query()
@@ -124,11 +128,14 @@ bool heavy_keeper::insert_basic_ver(const flow_id flow_id_obj)
         }
     }
     ss->update(std::make_pair(flow_id_obj, query_item(flow_id_obj)));
+    curr_count++;
+    return true;
 }
 
 bool heavy_keeper::insert(const flow_id &flow_id_obj) // software min version
 {
     const std::lock_guard<std::mutex> lock(insert_mutex);
+    curr_count++;
     int first_empty_i = -1;
     int first_empty_j = -1;
     for (int i = 0; i < d; i++) // If the flow is already monitored, just update it
@@ -211,6 +218,7 @@ const std::string heavy_keeper::get_parameter()
 
 bool heavy_keeper_opt::insert(const flow_id &flow_id_obj) // software min version
 {
+    curr_count++;
     int first_empty_i = -1;
     int first_empty_j = -1;
     for (int i = 0; i < d; i++) // If the flow is already monitored, just update it
@@ -329,6 +337,8 @@ void heavy_keeper_parallel::thread_handler(thread_para para)
 bool heavy_keeper_parallel::insert(const flow_id &flow_id_obj)
 {
     queue->enqueue(flow_id_obj);
+    curr_count++;
+    return true;
 }
 
 std::vector<std::pair<flow_id, int>> heavy_keeper_parallel::query()

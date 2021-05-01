@@ -67,6 +67,51 @@ void monitor_pkt_on_if(const char *if_name, int max_pkt_cnt, topk_algo_base* alg
     pcap_close(pcap_session);
 }
 
+void capture_thread_handler(pcap_t *pcap_session, int max_pkt_cnt, topk_algo_base* algo_obj, void (*on_finish)(void))
+{
+    // Start packet processing loop, just like live capture
+    printf("===== Start capturing =====\n");
+    if (pcap_loop(pcap_session, max_pkt_cnt, packetHandler, (u_char*) algo_obj) < 0)
+    {
+        printf("pcap_loop() failed: %s\n", pcap_geterr(pcap_session));
+        pcap_close(pcap_session);
+    }
+
+    printf("===== Capture finished =====\n");
+    pcap_close(pcap_session);
+    on_finish();
+}
+
+bool monitor_pkt_on_if_async(const char *if_name, int max_pkt_cnt, topk_algo_base* algo_obj, std::thread* capture_thread, void (*on_finish)(void))
+{
+    char errbuf[PCAP_ERRBUF_SIZE];
+    // Create a pcap session
+    pcap_t *pcap_session = pcap_open_live(if_name, 65535, 1, 500, errbuf);
+    if (pcap_session == NULL) {
+        fprintf(stderr, "pcap_open_live() failed: %s\n", errbuf);
+        return false;
+    }
+
+    // Construct and apply a BPF program
+    struct bpf_program filter;
+    if (pcap_compile(pcap_session, &filter, "(udp || tcp) || (vlan && (udp || tcp))", 1, 0) == PCAP_ERROR)
+    {
+        fprintf(stderr, "pcap_compile() failed: %s\n", pcap_geterr(pcap_session));
+        pcap_close(pcap_session);
+        return false;
+    };
+    if (pcap_setfilter(pcap_session, &filter) == PCAP_ERROR)
+    {
+        fprintf(stderr, "pcap_setfilter() failed: %s\n", pcap_geterr(pcap_session));
+        pcap_close(pcap_session);
+        return false;
+    }
+    pcap_freecode(&filter);
+
+    capture_thread = new std::thread(capture_thread_handler, pcap_session, max_pkt_cnt, algo_obj, on_finish);
+    return true;
+}
+
 void monitor_live(int max_pkt_cnt, topk_algo_base* algo_obj)
 {
     char errbuf[PCAP_ERRBUF_SIZE];

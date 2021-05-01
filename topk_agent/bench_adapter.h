@@ -10,7 +10,7 @@
  */
 #pragma once
 
-#include "topk.h"
+#include "common/common.h"
 #include "topk_algorithms.h"
 
 #define EXACT  0

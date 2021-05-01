@@ -13,6 +13,38 @@ message getif_response {
     repeated if_info_entry interface_list = 2;
 }
 
+message run_cap_request {
+    string protocol_version = 1;
+    string if_name = 2;
+    int64 pkt_count = 3;
+    int32 k = 4;
+}
+
+message run_cap_response {
+    string protocol_version = 1;
+    bool is_started = 2;
+}
+
+message get_cap_status_response {
+    string protocol_version = 1;
+    bool is_finished = 2;
+    int64 captured_pkt_count = 3;
+}
+
+message get_topk_result_response {
+    string protocol_version = 1;
+    bool is_finished = 2;
+    message topk_result_entry {
+        int32 id = 1;
+        string flow_description = 2;
+        int64 flow_count = 3;
+    }
+    repeated topk_result_entry topk_results = 3;
+}
+
 service tele_service {
     rpc get_if_list(empty_request) returns(getif_response);
+    rpc run_capture(run_cap_request) returns(run_cap_response);
+    rpc get_cap_status(empty_request) returns(get_cap_status_response);
+    rpc get_topk_result(empty_request) returns(get_topk_result_response);
 }

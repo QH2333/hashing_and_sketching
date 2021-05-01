@@ -16,7 +16,12 @@
                 <form name="topkQueryPlan">
                     <div class="form-group">
                         <label for="agentAddress">The address of top-k detection agent</label>
-                        <input type="text" class="form-control" id="agentAddress" value="localhost:5000">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="agentAddress" value="localhost:50051">
+                            <div class="input-group-append">
+                                <input type="button" class="btn btn-primary" id="updateInterface" value="Update Interface List">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group">

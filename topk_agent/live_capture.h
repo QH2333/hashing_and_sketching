@@ -39,6 +39,7 @@ struct if_info_t
 
 std::vector<if_info_t> get_interface_list();
 void monitor_pkt_on_if(const char *if_name, int max_pkt_cnt, topk_algo_base *algo_obj);
+bool monitor_pkt_on_if_async(const char *if_name, int max_pkt_cnt, topk_algo_base *algo_obj, std::thread* capture_thread, void (*on_finish)(void));
 
 /**
  * @brief Parse a packet using a state machine and write 13-byte 5-tuple into a file. Prototype is defined in conformance with `pcap_handler`.
