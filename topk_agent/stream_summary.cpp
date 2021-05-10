@@ -193,10 +193,10 @@ void stream_summary::print()
 {
     for (bucket *buk_iter = buk_head->next; buk_iter; buk_iter = buk_iter->next)
     {
-        std::cout << buk_iter->number << "\t" << buk_iter->first->id.print_detail() << std::endl;
+        std::cout << buk_iter->number << "\t" << buk_iter->first->id.to_string() << std::endl;
         for (node *node_iter = buk_iter->first->next; node_iter != buk_iter->first; node_iter = node_iter->next)
         {
-            std::cout << buk_iter->number << "\t" << node_iter->id.print_detail() << std::endl;
+            std::cout << buk_iter->number << "\t" << node_iter->id.to_string() << std::endl;
         }
     }
 }

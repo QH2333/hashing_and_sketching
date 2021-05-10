@@ -94,7 +94,7 @@ public:
         {
             get_topk_result_response::topk_result_entry *entry = response->add_topk_results();
             entry->set_id(i + 1);
-            entry->set_flow_description(topk_result[i].first.print_detail());
+            entry->set_flow_description(topk_result[i].first.to_json());
             entry->set_flow_count(topk_result[i].second);
         }
         return grpc::Status::OK;

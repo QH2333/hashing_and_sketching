@@ -11,7 +11,7 @@
 
 #include "flow_id.h"
 
-const std::string flow_id::print_detail() const
+const std::string flow_id::to_string() const
 {
     std::stringstream src_ip_stream;
     std::stringstream dst_ip_stream;
@@ -24,6 +24,26 @@ const std::string flow_id::print_detail() const
         detail_stream << "[UDP] ";
     detail_stream << std::internal << std::setw(21) << src_ip_stream.str() << " - " << dst_ip_stream.str();
     return detail_stream.str();
+}
+
+const std::string flow_id::to_json() const
+{
+    std::stringstream src_ip_stream;
+    std::stringstream dst_ip_stream;
+    std::stringstream json_stream;
+    json_stream << "{";
+    src_ip_stream << (int)id[0] << "." << (int)id[1] << "." << (int)id[2] << "." << (int)id[3];
+    dst_ip_stream << (int)id[4] << "." << (int)id[5] << "." << (int)id[6] << "." << (int)id[7];
+    if (id[12] == 0x06)
+        json_stream << " \"type\": \"TCP\" ";
+    else if (id[12] == 0x11)
+        json_stream << " \"type\": \"UDP\" ";
+    json_stream << ", \"src_ip\": \"" << src_ip_stream.str() << "\"";
+    json_stream << ", \"src_port\": " << ntohs(*(uint16_t *)(id + 8));
+    json_stream << ", \"dst_ip\": \"" << dst_ip_stream.str() << "\"";
+    json_stream << ", \"dst_port\": " << ntohs(*(uint16_t*)(id + 10));
+    json_stream << "}";
+    return json_stream.str();
 }
 
 const uint32_t flow_id::hash_with_seed(uint32_t seed) const

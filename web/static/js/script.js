@@ -61,7 +61,8 @@ function get_result() {
             var topk_list = JSON.parse(result);
             console.log(topk_list);
             for (var entry of topk_list) {
-                $("#result-table tbody").append('<tr> <th scope="row">' + entry[0] + '</th> <td>' + entry[1] + '</td> <td>' + entry[2] + '</td> </tr>');
+                var flow_detail = JSON.parse(entry[1]);
+                $("#result-table tbody").append('<tr> <th scope="row">' + entry[0] + '</th> <td>' + flow_detail.type + '</td> <td>' + flow_detail.src_ip + '</td> <td>' + flow_detail.src_port + '</td> <td>' + flow_detail.dst_ip + '</td> <td>' + flow_detail.dst_port + '</td> <td>' + entry[2] + '</td> </tr>');
             }
             $("#result-table").removeAttr("hidden");
         }

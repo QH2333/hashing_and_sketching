@@ -1,19 +1,45 @@
 import os
 import os.path
-import sys
 import time
 import json
-import threading
+
+import flask
+import flask_login
+import flask_wtf
+from wtforms import StringField, PasswordField, BooleanField
+from wtforms.validators import Length,DataRequired,Optional
+import mysql.connector
 
 import grpc
 import tele_service_pb2
 import tele_service_pb2_grpc
-import flask
-app = flask.Flask(__name__)
 
 BASE_DIR = "/home/qh2333/hashing_and_sketching/web"
 RPC_PROTOCOL_VER = "0.1"
 AGENT_ADDR = 'localhost:50051'
+db_host = "192.168.1.101"
+db_user = "topkmanagement"
+db_passwd = "admin"
+db_name = "topk"
+'''
+DB structure: 
+    create table user ( username varchar(16), password varchar(64) );
+To add new user: 
+    insert into user values ('admin', SHA2('password',256));
+'''
+
+app = flask.Flask(__name__)
+app.secret_key = b'topkmanagement'
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
+
+class MyUser(flask_login.UserMixin):
+    def __init__(self, id=None):
+        super().__init__()
+        self.id = id
+
+    def get_id(self):
+        return self.id
 
 def get_if_list():
     ret_val = []
@@ -50,10 +76,28 @@ def get_topk_result():
     return ret_val
 
 @app.route('/')
+def serve_login():
+    return flask.render_template("login.html")
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    username = flask.request.form['username']
+    password = flask.request.form['password']
+    identity = validate_user(username, password)
+    if (identity != None):
+        user = MyUser(username)
+        flask_login.login_user(user)
+        flask.flash('Logged in successfully.')
+        return flask.redirect("/app")
+    return flask.render_template('login.html')
+
+@app.route('/app')
+@flask_login.login_required
 def serve_main():
     return flask.render_template("main.html")
 
 @app.route('/getiflist')
+@flask_login.login_required
 def serve_getiflist():
     global AGENT_ADDR
     agent_addr = flask.request.args.get("agentAddress")
@@ -61,6 +105,7 @@ def serve_getiflist():
     return json.dumps(get_if_list())
 
 @app.route('/run_capture', methods = ["POST", "GET"])
+@flask_login.login_required
 def serve_run_capture():
     if_name = flask.request.args.get("ifname")
     pkt_cnt = int(flask.request.args.get("pktCount"))
@@ -72,6 +117,7 @@ def serve_run_capture():
         return "fail"
 
 @app.route('/get_progress', methods = ["POST", "GET"])
+@flask_login.login_required
 def serve_get_progress():
     status = get_cap_status()
     if status["is_finished"]:
@@ -80,8 +126,35 @@ def serve_get_progress():
         return str(status["captured_pkt_count"])
 
 @app.route('/get_result', methods = ["POST", "GET"])
+@flask_login.login_required
 def serve_get_result():
     return json.dumps(get_topk_result())
+
+@login_manager.user_loader
+def load_user(user_id):
+    conn = mysql.connector.connect(
+        user=db_user, host=db_host, password=db_passwd, database=db_name)
+    cursor = conn.cursor()
+    cursor.execute("select * from user where username='%s'" % user_id)
+    values = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    if len(values) != 0:
+        return MyUser(user_id)
+    else:
+        return None
+
+def validate_user(username=None, password=None):
+    conn = mysql.connector.connect(user=db_user, host=db_host, password=db_passwd, database=db_name)
+    cursor = conn.cursor()
+    cursor.execute("select * from user where username='%s' and password='%s'" % (username, password))
+    values = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    if len(values) != 0:
+        return MyUser(username)
+    else:
+        return None
 
 if __name__ == "__main__":
     print(get_if_list())

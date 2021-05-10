@@ -40,7 +40,8 @@ public:
         memcpy(this->id, _id, 13);
     }
 
-    const std::string print_detail() const;
+    const std::string to_string() const;
+    const std::string to_json() const;
     const uint32_t hash_with_seed(uint32_t seed) const;
     const bool is_null() const;
 };

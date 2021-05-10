@@ -144,7 +144,7 @@ void print_topk(const std::vector<std::pair<flow_id, int>> &topk_result)
 {
     for (auto iter = topk_result.begin(); iter != topk_result.end(); iter++)
     {
-        std::cout << "[" << std::setw(5) << iter->second << "]" << iter->first.print_detail() << std::endl;
+        std::cout << "[" << std::setw(5) << iter->second << "]" << iter->first.to_string() << std::endl;
     }
 }
 
