@@ -15,11 +15,7 @@
 #include "live_capture.h"
 
 // === Control the program's behavior here ===
-
-// #define ALGORITHM_TO_BENCH exact_algo
-// #define ALGORITHM_PARAMETER (K)
 #define RPC_PROTOCOL_VER "0.1"
-
 // === End of behavior control section ===
 
 void run_grpc_server();

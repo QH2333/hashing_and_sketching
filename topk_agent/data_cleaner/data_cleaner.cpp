@@ -19,7 +19,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 
-// Thrid-party library
+// Third-party library
 #include <pcap.h>
 
 // Project headers

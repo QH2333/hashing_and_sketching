@@ -42,10 +42,11 @@ bool benchmarking(const std::vector<flow_id> &packets)
         algo_performance_stat_t performance_stat;
         for (int i = 0; i < REPEAT_CNT; i++)
         {
-            // ALGORITHM_TO_BENCH *algo_obj = new ALGORITHM_TO_BENCH ALGORITHM_PARAMETER;
-            // std::cout << std::left << std::setw(15) << TO_STR(ALGORITHM_TO_BENCH);
+            // Get next execution plan
             algo_obj = adapter.get_bench_algo();
             algo_performance_t performance_one_run;
+
+            // Print: algorithm name, parameter, round 
             std::stringstream algo_detail;
             algo_detail << std::left << std::setw(15) << algo_obj->get_algo_name();
             algo_detail << std::left << std::setw(25) << algo_obj->get_parameter();
@@ -53,10 +54,12 @@ bool benchmarking(const std::vector<flow_id> &packets)
             std::cout << std::left << performance_stat.algo_detail;
             std::cout << std::left << std::setw(10) << i << std::flush;
 
+            // Run the bench
             insert_packets(packets, *algo_obj, performance_one_run);
             auto topk_result = query_topk(*algo_obj, performance_one_run);
             calc_metrics(topk_result, topk_ans, topk_ans_obj, performance_one_run);
 
+            // Print and accumulate performance statistics
             print_performance(std::cout, performance_one_run);
             std::cout << std::endl;
             performance_stat.put(performance_one_run);

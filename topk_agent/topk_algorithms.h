@@ -39,7 +39,7 @@ class topk_algo_base
 {
 public:
     topk_algo_base(){}
-    ~topk_algo_base(){}
+    virtual ~topk_algo_base(){}
 
 public:
     virtual bool insert(const uint8_t *flow_id_buf) = 0;
