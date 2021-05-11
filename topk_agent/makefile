@@ -8,6 +8,8 @@ all: clean compile run
 
 compile: topk
 
+recompile: clean topk
+
 run:
 	./topk > result.txt
 	less result.txt

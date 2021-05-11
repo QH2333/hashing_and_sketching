@@ -323,15 +323,39 @@ void heavy_keeper_parallel::thread_handler(thread_para para)
     uint32_t dispatcher_seed = para.dispatcher_seed;
     heavy_keeper **hk_array = para.hk_array;
     moodycamel::BlockingConcurrentQueue<flow_id> *queue = para.queue;
-    flow_id item_to_insert;
+    flow_id item_to_insert[100000];
     while (true)
     {
-        queue->wait_dequeue(item_to_insert);
+        size_t dequeue_count = queue->try_dequeue_bulk(item_to_insert, 100000);
         int dispatch_dst = th_id;
-        if (is_equal(NULL_FLOW, item_to_insert))
-            return;
-        hk_array[dispatch_dst]->insert(item_to_insert);
+        for (int i = 0; i < dequeue_count; i++)
+        {
+            if (is_equal(NULL_FLOW, item_to_insert[i]))
+            {
+                for (int j = i + 1; j < dequeue_count; j++)
+                {
+                    queue->enqueue(NULL_FLOW);
+                }
+                return;
+            }
+            hk_array[dispatch_dst]->insert(item_to_insert[i]);
+        }
     }
+
+    // flow_id item_to_insert;
+    // while (true)
+    // {
+    //     bool is_success = queue->try_dequeue(item_to_insert);
+    //     if (is_success)
+    //     {
+    //         if (is_equal(NULL_FLOW, item_to_insert))
+    //         {
+    //             return;
+    //         }
+    //         int dispatch_dst = th_id;
+    //         // hk_array[dispatch_dst]->insert(item_to_insert);
+    //     }
+    // }
 }
 
 bool heavy_keeper_parallel::insert(const flow_id &flow_id_obj)

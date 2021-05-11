@@ -25,6 +25,7 @@ bool capture_running = false;
 bool last_result_ready = false;
 std::thread *capture_thread = nullptr;
 topk_algo_base *algo_obj = nullptr;
+pcap_t* pcap_session = nullptr;
 std::vector<std::pair<flow_id, int>> topk_result;
 
 class tele_service_impl final : public tele_service::Service {
@@ -47,26 +48,35 @@ public:
     {
         std::cout << "[NewRPC]run_capture()" << std::endl;
         std::string if_name = request->if_name();
-        int pkt_cnt = request->pkt_count();
+        int capture_time = request->pkt_count();
         int k = request->k();
         algo_obj = new heavy_keeper(3, 1200, 1.08, k);
-        bool is_started = false;
         if (!capture_running)
         {
             test_for_join();
-            is_started = monitor_pkt_on_if_async(if_name.c_str(), pkt_cnt, algo_obj, capture_thread, []() -> void {
+            pcap_session = monitor_pkt_on_if_async(if_name.c_str(), capture_time, algo_obj, capture_thread, []() -> void {
                 topk_result = algo_obj->query();
                 last_result_ready = true;
                 capture_running = false;
             });
-            if (is_started)
+            if (pcap_session)
             {
                 last_result_ready = false;
                 capture_running = true;
             }
         }
         response->set_protocol_version(RPC_PROTOCOL_VER);
-        response->set_is_started(is_started);
+        response->set_is_started(pcap_session ? true : false);
+        return grpc::Status::OK;
+    }
+
+    grpc::Status stop_capture(::grpc::ServerContext* context, const empty_request* request, stop_cap_response* response) override
+    {
+        std::cout << "[NewRPC]stop_capture()" << std::endl;
+        test_for_join();
+        response->set_protocol_version(RPC_PROTOCOL_VER);
+        pcap_breakloop(pcap_session);
+        response->set_is_stopped(last_result_ready);
         return grpc::Status::OK;
     }
 

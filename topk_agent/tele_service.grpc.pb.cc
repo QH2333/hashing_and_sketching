@@ -23,6 +23,7 @@
 static const char* tele_service_method_names[] = {
   "/tele_service/get_if_list",
   "/tele_service/run_capture",
+  "/tele_service/stop_capture",
   "/tele_service/get_cap_status",
   "/tele_service/get_topk_result",
 };
@@ -36,8 +37,9 @@ std::unique_ptr< tele_service::Stub> tele_service::NewStub(const std::shared_ptr
 tele_service::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
   : channel_(channel), rpcmethod_get_if_list_(tele_service_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_run_capture_(tele_service_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_get_cap_status_(tele_service_method_names[2], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_get_topk_result_(tele_service_method_names[3], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_stop_capture_(tele_service_method_names[2], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_get_cap_status_(tele_service_method_names[3], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_get_topk_result_(tele_service_method_names[4], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status tele_service::Stub::get_if_list(::grpc::ClientContext* context, const ::empty_request& request, ::getif_response* response) {
@@ -82,6 +84,29 @@ void tele_service::Stub::experimental_async::run_capture(::grpc::ClientContext* 
 ::grpc::ClientAsyncResponseReader< ::run_cap_response>* tele_service::Stub::Asyncrun_captureRaw(::grpc::ClientContext* context, const ::run_cap_request& request, ::grpc::CompletionQueue* cq) {
   auto* result =
     this->PrepareAsyncrun_captureRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status tele_service::Stub::stop_capture(::grpc::ClientContext* context, const ::empty_request& request, ::stop_cap_response* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::empty_request, ::stop_cap_response, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_stop_capture_, context, request, response);
+}
+
+void tele_service::Stub::experimental_async::stop_capture(::grpc::ClientContext* context, const ::empty_request* request, ::stop_cap_response* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::empty_request, ::stop_cap_response, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_stop_capture_, context, request, response, std::move(f));
+}
+
+void tele_service::Stub::experimental_async::stop_capture(::grpc::ClientContext* context, const ::empty_request* request, ::stop_cap_response* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_stop_capture_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::stop_cap_response>* tele_service::Stub::PrepareAsyncstop_captureRaw(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::stop_cap_response, ::empty_request, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_stop_capture_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::stop_cap_response>* tele_service::Stub::Asyncstop_captureRaw(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncstop_captureRaw(context, request, cq);
   result->StartCall();
   return result;
 }
@@ -156,6 +181,16 @@ tele_service::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       tele_service_method_names[2],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< tele_service::Service, ::empty_request, ::stop_cap_response, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](tele_service::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::empty_request* req,
+             ::stop_cap_response* resp) {
+               return service->stop_capture(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      tele_service_method_names[3],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< tele_service::Service, ::empty_request, ::get_cap_status_response, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](tele_service::Service* service,
              ::grpc::ServerContext* ctx,
@@ -164,7 +199,7 @@ tele_service::Service::Service() {
                return service->get_cap_status(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      tele_service_method_names[3],
+      tele_service_method_names[4],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< tele_service::Service, ::empty_request, ::get_topk_result_response, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](tele_service::Service* service,
@@ -186,6 +221,13 @@ tele_service::Service::~Service() {
 }
 
 ::grpc::Status tele_service::Service::run_capture(::grpc::ServerContext* context, const ::run_cap_request* request, ::run_cap_response* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status tele_service::Service::stop_capture(::grpc::ServerContext* context, const ::empty_request* request, ::stop_cap_response* response) {
   (void) context;
   (void) request;
   (void) response;

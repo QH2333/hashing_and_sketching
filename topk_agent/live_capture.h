@@ -18,7 +18,7 @@
 #include "common/pkt_headers.h"
 
 // === Control the program's behavior here ===
-constexpr bool VERBOSE = true;
+constexpr bool VERBOSE = false;
 constexpr bool CONCISE_INFO = true;
 // === End of behavior control section ===
 
@@ -39,7 +39,19 @@ struct if_info_t
 
 std::vector<if_info_t> get_interface_list();
 void monitor_pkt_on_if(const char *if_name, int max_pkt_cnt, topk_algo_base *algo_obj);
-bool monitor_pkt_on_if_async(const char *if_name, int max_pkt_cnt, topk_algo_base *algo_obj, std::thread* capture_thread, void (*on_finish)(void));
+
+/**
+ * @brief Used in parameter -s
+ * 
+ * @param if_name 
+ * @param max_pkt_cnt 
+ * @param algo_obj 
+ * @param capture_thread 
+ * @param on_finish 
+ * @return true 
+ * @return false 
+ */
+pcap_t * monitor_pkt_on_if_async(const char *if_name, int max_pkt_cnt, topk_algo_base *algo_obj, std::thread* capture_thread, void (*on_finish)(void));
 
 /**
  * @brief Parse a packet using a state machine and write 13-byte 5-tuple into a file. Prototype is defined in conformance with `pcap_handler`.
@@ -49,4 +61,11 @@ bool monitor_pkt_on_if_async(const char *if_name, int max_pkt_cnt, topk_algo_bas
  * @param packet The content of a layer-2 packet.
  */
 void packetHandler(u_char *userData, const struct pcap_pkthdr *pkthdr, const u_char *packet);
+
+/**
+ * @brief Used in parameter -i
+ * 
+ * @param max_pkt_cnt 
+ * @param algo_obj 
+ */
 void monitor_live(int max_pkt_cnt, topk_algo_base *algo_obj);

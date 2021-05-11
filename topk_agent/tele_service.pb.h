@@ -46,7 +46,7 @@ struct TableStruct_tele_5fservice_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[8]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[9]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -77,6 +77,9 @@ extern run_cap_requestDefaultTypeInternal _run_cap_request_default_instance_;
 class run_cap_response;
 class run_cap_responseDefaultTypeInternal;
 extern run_cap_responseDefaultTypeInternal _run_cap_response_default_instance_;
+class stop_cap_response;
+class stop_cap_responseDefaultTypeInternal;
+extern stop_cap_responseDefaultTypeInternal _stop_cap_response_default_instance_;
 PROTOBUF_NAMESPACE_OPEN
 template<> ::empty_request* Arena::CreateMaybeMessage<::empty_request>(Arena*);
 template<> ::get_cap_status_response* Arena::CreateMaybeMessage<::get_cap_status_response>(Arena*);
@@ -86,6 +89,7 @@ template<> ::getif_response* Arena::CreateMaybeMessage<::getif_response>(Arena*)
 template<> ::getif_response_if_info_entry* Arena::CreateMaybeMessage<::getif_response_if_info_entry>(Arena*);
 template<> ::run_cap_request* Arena::CreateMaybeMessage<::run_cap_request>(Arena*);
 template<> ::run_cap_response* Arena::CreateMaybeMessage<::run_cap_response>(Arena*);
+template<> ::stop_cap_response* Arena::CreateMaybeMessage<::stop_cap_response>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 
 // ===================================================================
@@ -896,6 +900,160 @@ class run_cap_response PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
+class stop_cap_response PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:stop_cap_response) */ {
+ public:
+  inline stop_cap_response() : stop_cap_response(nullptr) {}
+  virtual ~stop_cap_response();
+
+  stop_cap_response(const stop_cap_response& from);
+  stop_cap_response(stop_cap_response&& from) noexcept
+    : stop_cap_response() {
+    *this = ::std::move(from);
+  }
+
+  inline stop_cap_response& operator=(const stop_cap_response& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline stop_cap_response& operator=(stop_cap_response&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const stop_cap_response& default_instance();
+
+  static inline const stop_cap_response* internal_default_instance() {
+    return reinterpret_cast<const stop_cap_response*>(
+               &_stop_cap_response_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  friend void swap(stop_cap_response& a, stop_cap_response& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(stop_cap_response* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(stop_cap_response* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline stop_cap_response* New() const final {
+    return CreateMaybeMessage<stop_cap_response>(nullptr);
+  }
+
+  stop_cap_response* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<stop_cap_response>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const stop_cap_response& from);
+  void MergeFrom(const stop_cap_response& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(stop_cap_response* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "stop_cap_response";
+  }
+  protected:
+  explicit stop_cap_response(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_tele_5fservice_2eproto);
+    return ::descriptor_table_tele_5fservice_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kProtocolVersionFieldNumber = 1,
+    kIsStoppedFieldNumber = 2,
+  };
+  // string protocol_version = 1;
+  void clear_protocol_version();
+  const std::string& protocol_version() const;
+  void set_protocol_version(const std::string& value);
+  void set_protocol_version(std::string&& value);
+  void set_protocol_version(const char* value);
+  void set_protocol_version(const char* value, size_t size);
+  std::string* mutable_protocol_version();
+  std::string* release_protocol_version();
+  void set_allocated_protocol_version(std::string* protocol_version);
+  private:
+  const std::string& _internal_protocol_version() const;
+  void _internal_set_protocol_version(const std::string& value);
+  std::string* _internal_mutable_protocol_version();
+  public:
+
+  // bool is_stopped = 2;
+  void clear_is_stopped();
+  bool is_stopped() const;
+  void set_is_stopped(bool value);
+  private:
+  bool _internal_is_stopped() const;
+  void _internal_set_is_stopped(bool value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:stop_cap_response)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr protocol_version_;
+  bool is_stopped_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_tele_5fservice_2eproto;
+};
+// -------------------------------------------------------------------
+
 class get_cap_status_response PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:get_cap_status_response) */ {
  public:
@@ -937,7 +1095,7 @@ class get_cap_status_response PROTOBUF_FINAL :
                &_get_cap_status_response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   friend void swap(get_cap_status_response& a, get_cap_status_response& b) {
     a.Swap(&b);
@@ -1102,7 +1260,7 @@ class get_topk_result_response_topk_result_entry PROTOBUF_FINAL :
                &_get_topk_result_response_topk_result_entry_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   friend void swap(get_topk_result_response_topk_result_entry& a, get_topk_result_response_topk_result_entry& b) {
     a.Swap(&b);
@@ -1267,7 +1425,7 @@ class get_topk_result_response PROTOBUF_FINAL :
                &_get_topk_result_response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   friend void swap(get_topk_result_response& a, get_topk_result_response& b) {
     a.Swap(&b);
@@ -1955,6 +2113,91 @@ inline void run_cap_response::set_is_started(bool value) {
 
 // -------------------------------------------------------------------
 
+// stop_cap_response
+
+// string protocol_version = 1;
+inline void stop_cap_response::clear_protocol_version() {
+  protocol_version_.ClearToEmpty();
+}
+inline const std::string& stop_cap_response::protocol_version() const {
+  // @@protoc_insertion_point(field_get:stop_cap_response.protocol_version)
+  return _internal_protocol_version();
+}
+inline void stop_cap_response::set_protocol_version(const std::string& value) {
+  _internal_set_protocol_version(value);
+  // @@protoc_insertion_point(field_set:stop_cap_response.protocol_version)
+}
+inline std::string* stop_cap_response::mutable_protocol_version() {
+  // @@protoc_insertion_point(field_mutable:stop_cap_response.protocol_version)
+  return _internal_mutable_protocol_version();
+}
+inline const std::string& stop_cap_response::_internal_protocol_version() const {
+  return protocol_version_.Get();
+}
+inline void stop_cap_response::_internal_set_protocol_version(const std::string& value) {
+  
+  protocol_version_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline void stop_cap_response::set_protocol_version(std::string&& value) {
+  
+  protocol_version_.Set(
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:stop_cap_response.protocol_version)
+}
+inline void stop_cap_response::set_protocol_version(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  protocol_version_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(value), GetArena());
+  // @@protoc_insertion_point(field_set_char:stop_cap_response.protocol_version)
+}
+inline void stop_cap_response::set_protocol_version(const char* value,
+    size_t size) {
+  
+  protocol_version_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:stop_cap_response.protocol_version)
+}
+inline std::string* stop_cap_response::_internal_mutable_protocol_version() {
+  
+  return protocol_version_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* stop_cap_response::release_protocol_version() {
+  // @@protoc_insertion_point(field_release:stop_cap_response.protocol_version)
+  return protocol_version_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void stop_cap_response::set_allocated_protocol_version(std::string* protocol_version) {
+  if (protocol_version != nullptr) {
+    
+  } else {
+    
+  }
+  protocol_version_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), protocol_version,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:stop_cap_response.protocol_version)
+}
+
+// bool is_stopped = 2;
+inline void stop_cap_response::clear_is_stopped() {
+  is_stopped_ = false;
+}
+inline bool stop_cap_response::_internal_is_stopped() const {
+  return is_stopped_;
+}
+inline bool stop_cap_response::is_stopped() const {
+  // @@protoc_insertion_point(field_get:stop_cap_response.is_stopped)
+  return _internal_is_stopped();
+}
+inline void stop_cap_response::_internal_set_is_stopped(bool value) {
+  
+  is_stopped_ = value;
+}
+inline void stop_cap_response::set_is_stopped(bool value) {
+  _internal_set_is_stopped(value);
+  // @@protoc_insertion_point(field_set:stop_cap_response.is_stopped)
+}
+
+// -------------------------------------------------------------------
+
 // get_cap_status_response
 
 // string protocol_version = 1;
@@ -2290,6 +2533,8 @@ get_topk_result_response::topk_results() const {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
