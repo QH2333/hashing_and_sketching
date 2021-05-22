@@ -58,6 +58,13 @@ def run_capture(if_name, pkt_cnt, k):
         response = stub.run_capture(request)
         return response.is_started
 
+def stop_capture():
+    with grpc.insecure_channel(AGENT_ADDR) as channel:
+        stub = tele_service_pb2_grpc.tele_serviceStub(channel)
+        request = tele_service_pb2.empty_request(protocol_version=RPC_PROTOCOL_VER)
+        response = stub.stop_capture(request)
+        return response.is_stopped
+
 def get_cap_status():
     with grpc.insecure_channel(AGENT_ADDR) as channel:
         stub = tele_service_pb2_grpc.tele_serviceStub(channel)
@@ -115,6 +122,15 @@ def serve_run_capture():
         return "success"
     else:
         return "fail"
+
+@app.route('/stop_capture', methods = ["POST", "GET"])
+@flask_login.login_required
+def serve_stop_capture():
+    is_stopped = stop_capture()
+    if is_stopped:
+        return "stopped"
+    else:
+        return "delayed"
 
 @app.route('/get_progress', methods = ["POST", "GET"])
 @flask_login.login_required

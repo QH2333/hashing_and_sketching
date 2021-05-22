@@ -122,6 +122,8 @@ void monitor_live(int max_pkt_cnt, topk_algo_base* algo_obj)
 
     int id = 0;
     int selected_id = 0;
+    int time_window = 0;
+    int k = 0;
     printf("List of all network devices:\n");
     for (auto interface: if_list)
     {
@@ -136,9 +138,13 @@ void monitor_live(int max_pkt_cnt, topk_algo_base* algo_obj)
         read_cnt = scanf("%d", &selected_id);
     }
     strncpy(devnamebuf, if_list[selected_id-1].name.c_str(), 255);
+    printf("Time window: ");
+    read_cnt = scanf("%d", &time_window);
+    printf("Size of k: ");
+    read_cnt = scanf("%d", &k);
     printf("Capturing %s.\n", devnamebuf);
 
-    monitor_pkt_on_if(devnamebuf, max_pkt_cnt, algo_obj);
+    monitor_pkt_on_if(devnamebuf, time_window, algo_obj);
 }
 
 #define PARSE_START 0

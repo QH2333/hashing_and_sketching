@@ -36,6 +36,10 @@ class run_cap_responseDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<run_cap_response> _instance;
 } _run_cap_response_default_instance_;
+class stop_cap_responseDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<stop_cap_response> _instance;
+} _stop_cap_response_default_instance_;
 class get_cap_status_responseDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<get_cap_status_response> _instance;
@@ -154,7 +158,20 @@ static void InitDefaultsscc_info_run_cap_response_tele_5fservice_2eproto() {
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_run_cap_response_tele_5fservice_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_run_cap_response_tele_5fservice_2eproto}, {}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_tele_5fservice_2eproto[8];
+static void InitDefaultsscc_info_stop_cap_response_tele_5fservice_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::_stop_cap_response_default_instance_;
+    new (ptr) ::stop_cap_response();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_stop_cap_response_tele_5fservice_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_stop_cap_response_tele_5fservice_2eproto}, {}};
+
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_tele_5fservice_2eproto[9];
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_tele_5fservice_2eproto = nullptr;
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_tele_5fservice_2eproto = nullptr;
 
@@ -196,6 +213,13 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_tele_5fservice_2eproto::offset
   PROTOBUF_FIELD_OFFSET(::run_cap_response, protocol_version_),
   PROTOBUF_FIELD_OFFSET(::run_cap_response, is_started_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::stop_cap_response, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::stop_cap_response, protocol_version_),
+  PROTOBUF_FIELD_OFFSET(::stop_cap_response, is_stopped_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::get_cap_status_response, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -226,9 +250,10 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 13, -1, sizeof(::getif_response)},
   { 20, -1, sizeof(::run_cap_request)},
   { 29, -1, sizeof(::run_cap_response)},
-  { 36, -1, sizeof(::get_cap_status_response)},
-  { 44, -1, sizeof(::get_topk_result_response_topk_result_entry)},
-  { 52, -1, sizeof(::get_topk_result_response)},
+  { 36, -1, sizeof(::stop_cap_response)},
+  { 43, -1, sizeof(::get_cap_status_response)},
+  { 51, -1, sizeof(::get_topk_result_response_topk_result_entry)},
+  { 59, -1, sizeof(::get_topk_result_response)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -237,6 +262,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_getif_response_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_run_cap_request_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_run_cap_response_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_stop_cap_response_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_get_cap_status_response_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_get_topk_result_response_topk_result_entry_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_get_topk_result_response_default_instance_),
@@ -252,25 +278,28 @@ const char descriptor_table_protodef_tele_5fservice_2eproto[] PROTOBUF_SECTION_V
   "\022\030\n\020protocol_version\030\001 \001(\t\022\017\n\007if_name\030\002 "
   "\001(\t\022\021\n\tpkt_count\030\003 \001(\003\022\t\n\001k\030\004 \001(\005\"@\n\020run"
   "_cap_response\022\030\n\020protocol_version\030\001 \001(\t\022"
-  "\022\n\nis_started\030\002 \001(\010\"d\n\027get_cap_status_re"
-  "sponse\022\030\n\020protocol_version\030\001 \001(\t\022\023\n\013is_f"
-  "inished\030\002 \001(\010\022\032\n\022captured_pkt_count\030\003 \001("
-  "\003\"\333\001\n\030get_topk_result_response\022\030\n\020protoc"
-  "ol_version\030\001 \001(\t\022\023\n\013is_finished\030\002 \001(\010\022A\n"
-  "\014topk_results\030\003 \003(\0132+.get_topk_result_re"
-  "sponse.topk_result_entry\032M\n\021topk_result_"
-  "entry\022\n\n\002id\030\001 \001(\005\022\030\n\020flow_description\030\002 "
-  "\001(\t\022\022\n\nflow_count\030\003 \001(\0032\354\001\n\014tele_service"
-  "\022.\n\013get_if_list\022\016.empty_request\032\017.getif_"
-  "response\0222\n\013run_capture\022\020.run_cap_reques"
-  "t\032\021.run_cap_response\022:\n\016get_cap_status\022\016"
-  ".empty_request\032\030.get_cap_status_response"
-  "\022<\n\017get_topk_result\022\016.empty_request\032\031.ge"
-  "t_topk_result_responseb\006proto3"
+  "\022\n\nis_started\030\002 \001(\010\"A\n\021stop_cap_response"
+  "\022\030\n\020protocol_version\030\001 \001(\t\022\022\n\nis_stopped"
+  "\030\002 \001(\010\"d\n\027get_cap_status_response\022\030\n\020pro"
+  "tocol_version\030\001 \001(\t\022\023\n\013is_finished\030\002 \001(\010"
+  "\022\032\n\022captured_pkt_count\030\003 \001(\003\"\333\001\n\030get_top"
+  "k_result_response\022\030\n\020protocol_version\030\001 "
+  "\001(\t\022\023\n\013is_finished\030\002 \001(\010\022A\n\014topk_results"
+  "\030\003 \003(\0132+.get_topk_result_response.topk_r"
+  "esult_entry\032M\n\021topk_result_entry\022\n\n\002id\030\001"
+  " \001(\005\022\030\n\020flow_description\030\002 \001(\t\022\022\n\nflow_c"
+  "ount\030\003 \001(\0032\240\002\n\014tele_service\022.\n\013get_if_li"
+  "st\022\016.empty_request\032\017.getif_response\0222\n\013r"
+  "un_capture\022\020.run_cap_request\032\021.run_cap_r"
+  "esponse\0222\n\014stop_capture\022\016.empty_request\032"
+  "\022.stop_cap_response\022:\n\016get_cap_status\022\016."
+  "empty_request\032\030.get_cap_status_response\022"
+  "<\n\017get_topk_result\022\016.empty_request\032\031.get"
+  "_topk_result_responseb\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_tele_5fservice_2eproto_deps[1] = {
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_tele_5fservice_2eproto_sccs[8] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_tele_5fservice_2eproto_sccs[9] = {
   &scc_info_empty_request_tele_5fservice_2eproto.base,
   &scc_info_get_cap_status_response_tele_5fservice_2eproto.base,
   &scc_info_get_topk_result_response_tele_5fservice_2eproto.base,
@@ -279,13 +308,14 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_tel
   &scc_info_getif_response_if_info_entry_tele_5fservice_2eproto.base,
   &scc_info_run_cap_request_tele_5fservice_2eproto.base,
   &scc_info_run_cap_response_tele_5fservice_2eproto.base,
+  &scc_info_stop_cap_response_tele_5fservice_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_tele_5fservice_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_tele_5fservice_2eproto = {
-  false, false, descriptor_table_protodef_tele_5fservice_2eproto, "tele_service.proto", 950,
-  &descriptor_table_tele_5fservice_2eproto_once, descriptor_table_tele_5fservice_2eproto_sccs, descriptor_table_tele_5fservice_2eproto_deps, 8, 0,
+  false, false, descriptor_table_protodef_tele_5fservice_2eproto, "tele_service.proto", 1069,
+  &descriptor_table_tele_5fservice_2eproto_once, descriptor_table_tele_5fservice_2eproto_sccs, descriptor_table_tele_5fservice_2eproto_deps, 9, 0,
   schemas, file_default_instances, TableStruct_tele_5fservice_2eproto::offsets,
-  file_level_metadata_tele_5fservice_2eproto, 8, file_level_enum_descriptors_tele_5fservice_2eproto, file_level_service_descriptors_tele_5fservice_2eproto,
+  file_level_metadata_tele_5fservice_2eproto, 9, file_level_enum_descriptors_tele_5fservice_2eproto, file_level_service_descriptors_tele_5fservice_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -1518,6 +1548,237 @@ void run_cap_response::InternalSwap(run_cap_response* other) {
 
 // ===================================================================
 
+class stop_cap_response::_Internal {
+ public:
+};
+
+stop_cap_response::stop_cap_response(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:stop_cap_response)
+}
+stop_cap_response::stop_cap_response(const stop_cap_response& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  protocol_version_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_protocol_version().empty()) {
+    protocol_version_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_protocol_version(), 
+      GetArena());
+  }
+  is_stopped_ = from.is_stopped_;
+  // @@protoc_insertion_point(copy_constructor:stop_cap_response)
+}
+
+void stop_cap_response::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_stop_cap_response_tele_5fservice_2eproto.base);
+  protocol_version_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  is_stopped_ = false;
+}
+
+stop_cap_response::~stop_cap_response() {
+  // @@protoc_insertion_point(destructor:stop_cap_response)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void stop_cap_response::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  protocol_version_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+void stop_cap_response::ArenaDtor(void* object) {
+  stop_cap_response* _this = reinterpret_cast< stop_cap_response* >(object);
+  (void)_this;
+}
+void stop_cap_response::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void stop_cap_response::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const stop_cap_response& stop_cap_response::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_stop_cap_response_tele_5fservice_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void stop_cap_response::Clear() {
+// @@protoc_insertion_point(message_clear_start:stop_cap_response)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  protocol_version_.ClearToEmpty();
+  is_stopped_ = false;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* stop_cap_response::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // string protocol_version = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          auto str = _internal_mutable_protocol_version();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "stop_cap_response.protocol_version"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // bool is_stopped = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+          is_stopped_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* stop_cap_response::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:stop_cap_response)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string protocol_version = 1;
+  if (this->protocol_version().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_protocol_version().data(), static_cast<int>(this->_internal_protocol_version().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "stop_cap_response.protocol_version");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_protocol_version(), target);
+  }
+
+  // bool is_stopped = 2;
+  if (this->is_stopped() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(2, this->_internal_is_stopped(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:stop_cap_response)
+  return target;
+}
+
+size_t stop_cap_response::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:stop_cap_response)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string protocol_version = 1;
+  if (this->protocol_version().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_protocol_version());
+  }
+
+  // bool is_stopped = 2;
+  if (this->is_stopped() != 0) {
+    total_size += 1 + 1;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void stop_cap_response::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:stop_cap_response)
+  GOOGLE_DCHECK_NE(&from, this);
+  const stop_cap_response* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<stop_cap_response>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:stop_cap_response)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:stop_cap_response)
+    MergeFrom(*source);
+  }
+}
+
+void stop_cap_response::MergeFrom(const stop_cap_response& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:stop_cap_response)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.protocol_version().size() > 0) {
+    _internal_set_protocol_version(from._internal_protocol_version());
+  }
+  if (from.is_stopped() != 0) {
+    _internal_set_is_stopped(from._internal_is_stopped());
+  }
+}
+
+void stop_cap_response::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:stop_cap_response)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void stop_cap_response::CopyFrom(const stop_cap_response& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:stop_cap_response)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool stop_cap_response::IsInitialized() const {
+  return true;
+}
+
+void stop_cap_response::InternalSwap(stop_cap_response* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  protocol_version_.Swap(&other->protocol_version_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  swap(is_stopped_, other->is_stopped_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata stop_cap_response::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
 class get_cap_status_response::_Internal {
  public:
 };
@@ -2329,6 +2590,9 @@ template<> PROTOBUF_NOINLINE ::run_cap_request* Arena::CreateMaybeMessage< ::run
 }
 template<> PROTOBUF_NOINLINE ::run_cap_response* Arena::CreateMaybeMessage< ::run_cap_response >(Arena* arena) {
   return Arena::CreateMessageInternal< ::run_cap_response >(arena);
+}
+template<> PROTOBUF_NOINLINE ::stop_cap_response* Arena::CreateMaybeMessage< ::stop_cap_response >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::stop_cap_response >(arena);
 }
 template<> PROTOBUF_NOINLINE ::get_cap_status_response* Arena::CreateMaybeMessage< ::get_cap_status_response >(Arena* arena) {
   return Arena::CreateMessageInternal< ::get_cap_status_response >(arena);

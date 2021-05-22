@@ -24,6 +24,11 @@ class tele_serviceStub(object):
                 request_serializer=tele__service__pb2.run_cap_request.SerializeToString,
                 response_deserializer=tele__service__pb2.run_cap_response.FromString,
                 )
+        self.stop_capture = channel.unary_unary(
+                '/tele_service/stop_capture',
+                request_serializer=tele__service__pb2.empty_request.SerializeToString,
+                response_deserializer=tele__service__pb2.stop_cap_response.FromString,
+                )
         self.get_cap_status = channel.unary_unary(
                 '/tele_service/get_cap_status',
                 request_serializer=tele__service__pb2.empty_request.SerializeToString,
@@ -46,6 +51,12 @@ class tele_serviceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def run_capture(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def stop_capture(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -75,6 +86,11 @@ def add_tele_serviceServicer_to_server(servicer, server):
                     servicer.run_capture,
                     request_deserializer=tele__service__pb2.run_cap_request.FromString,
                     response_serializer=tele__service__pb2.run_cap_response.SerializeToString,
+            ),
+            'stop_capture': grpc.unary_unary_rpc_method_handler(
+                    servicer.stop_capture,
+                    request_deserializer=tele__service__pb2.empty_request.FromString,
+                    response_serializer=tele__service__pb2.stop_cap_response.SerializeToString,
             ),
             'get_cap_status': grpc.unary_unary_rpc_method_handler(
                     servicer.get_cap_status,
@@ -127,6 +143,23 @@ class tele_service(object):
         return grpc.experimental.unary_unary(request, target, '/tele_service/run_capture',
             tele__service__pb2.run_cap_request.SerializeToString,
             tele__service__pb2.run_cap_response.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def stop_capture(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/tele_service/stop_capture',
+            tele__service__pb2.empty_request.SerializeToString,
+            tele__service__pb2.stop_cap_response.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

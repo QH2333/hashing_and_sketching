@@ -25,6 +25,11 @@ message run_cap_response {
     bool is_started = 2;
 }
 
+message stop_cap_response {
+    string protocol_version = 1;
+    bool is_stopped = 2;
+}
+
 message get_cap_status_response {
     string protocol_version = 1;
     bool is_finished = 2;
@@ -45,6 +50,7 @@ message get_topk_result_response {
 service tele_service {
     rpc get_if_list(empty_request) returns(getif_response);
     rpc run_capture(run_cap_request) returns(run_cap_response);
+    rpc stop_capture(empty_request) returns(stop_cap_response);
     rpc get_cap_status(empty_request) returns(get_cap_status_response);
     rpc get_topk_result(empty_request) returns(get_topk_result_response);
 }

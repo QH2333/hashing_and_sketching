@@ -3,6 +3,8 @@ $(document).ready(function() {
 
 });
 
+var time_window_len;
+var elapsed_time = 0;
 var timer;
 var current_query_para;
 
@@ -19,18 +21,20 @@ $("#updateInterface").click(function () {
 // Post capture parameters
 $("#topkStart").click(function() {
     var ifname = document.forms["topkQueryPlan"]["interfaceName"].value;
-    var pktCount = document.forms["topkQueryPlan"]["pktCount"].value;
+    var pktCount = -1;
     var k = document.forms["topkQueryPlan"]["k"].value;
+    time_window_len = document.forms["topkQueryPlan"]["timeWindowLen"].value;
     current_query_para = {ifname: ifname, pktCount: pktCount, k: k};
     $.ajax({
         type: "GET", 
         url: "/run_capture", 
         data: current_query_para, 
-        success: function(result) {
+        success: function (result) {
+            elapsed_time = 0;
             $("#result").removeAttr("hidden");
             $("#capture-progress").attr("style", "width: 0%");
             $("#result-table tbody").children().remove();
-            timer = setInterval(check_progress, 1000)
+            timer = setInterval(check_progress, 1000);
             console.log(result);
         }
     });
@@ -38,6 +42,29 @@ $("#topkStart").click(function() {
 });
 
 function check_progress() {
+    elapsed_time += 1;
+    if (elapsed_time < time_window_len) {
+        $("#capture-progress").attr("style", "width: " + (elapsed_time / time_window_len) * 100 + "%");
+    }
+    else {
+        clearInterval(timer);
+        $.ajax({
+            type: "GET", 
+            url: "/stop_capture", 
+            success: function(result) {
+                clearInterval(timer);
+                if (result == "stopped") {
+                    $("#capture-progress").attr("style", "width: 100%");
+                    get_result();
+                } else {
+                    timer = setInterval(wait_for_stop, 1000);
+                }
+            }
+        });
+    }
+};
+
+function wait_for_stop() {
     $.ajax({
         type: "GET", 
         url: "/get_progress", 
@@ -46,12 +73,10 @@ function check_progress() {
                 $("#capture-progress").attr("style", "width: 100%");
                 clearInterval(timer);
                 get_result();
-            } else {
-                $("#capture-progress").attr("style", "width: " + (result / current_query_para.pktCount) * 100 + "%");
             }
         }
     });
-};
+}
 
 function get_result() {
     $.ajax({

@@ -34,7 +34,7 @@
 
 bool read_packets(std::vector<flow_id> &packets, const size_t rss_before_invoke);
 
-bool insert_packets(const std::vector<flow_id> &packets, topk_algo_base &algo_obj, algo_performance_t &performance);
+bool insert_packets(const std::vector<flow_id> &packets, topk_algo_base &algo_obj, int cnt, algo_performance_t &performance);
 
 std::vector<std::pair<flow_id, int>> query_topk(topk_algo_base &algo_obj, algo_performance_t &performance);
 
@@ -42,7 +42,7 @@ void print_topk(const std::vector<std::pair<flow_id, int>> &topk_result);
 
 void print_performance(std::ostream &writer, algo_performance_t performance);
 
-std::vector<std::pair<flow_id, int>> calc_answer(const std::vector<flow_id> &packets, topk_algo_base &ans_obj);
+std::vector<std::pair<flow_id, int>> calc_answer(const std::vector<flow_id> &packets, topk_algo_base &ans_obj, int cnt);
 
 bool calc_metrics(const std::vector<std::pair<flow_id, int>> &result, const std::vector<std::pair<flow_id, int>> &ans, topk_algo_base &ans_obj, algo_performance_t &performance);
 

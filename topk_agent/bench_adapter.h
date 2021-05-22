@@ -19,60 +19,61 @@
 class bench_adapter
 {
 private:
-    std::ifstream plan_file;
-    char last_line_buf[100];
+    struct cm_heap_para_t // Count-Min Heap
+    {
+        int d;
+        int m;
+    };
+    struct hk_para_t // HeavyKeeper
+    {
+        int d;
+        int w;
+        float b;
+    };
+    struct hkp_para_t // HeavyKeeper parallel
+    {
+        int d;
+        int w;
+        float b;
+        int th_cnt;
+    };
 
 private:
-    topk_algo_base *parse_last_line()
+    std::ifstream plan_file;
+    char last_line_buf[100];
+    int read_cnt;
+    int k;
+    std::string algo_name;
+    cm_heap_para_t cm_heap_para;
+    hk_para_t hk_para;
+    hkp_para_t hkp_para;
+
+private:
+    void parse_last_line()
     {
         std::stringstream last_line;
         last_line << last_line_buf;
-        topk_algo_base *algo_obj;
-        std::string algo_name;
+        
+        last_line >> read_cnt;
+        last_line >> k;
         last_line >> algo_name;
-        if (algo_name == "exact_algo")
+
+        if (algo_name == "count_min_heap")
         {
-            int k;
-            last_line >> k;
-            algo_obj = new exact_algo(k);
-        }
-        else if (algo_name == "count_min_heap")
-        {
-            int d;
-            int m;
-            int k;
-            last_line >> d >> m >> k;
-            algo_obj = new count_min_heap(d, m, k);
+            last_line >> cm_heap_para.d >> cm_heap_para.m;
         }
         else if (algo_name == "heavy_keeper")
         {
-            int d;
-            int w;
-            float b;
-            int k;
-            last_line >> d >> w >> b >> k;
-            algo_obj = new heavy_keeper(d, w, b, k);
+            last_line >> hk_para.d >> hk_para.w >> hk_para.b;
         }
         else if (algo_name == "heavy_keeper_opt")
         {
-            int d;
-            int w;
-            float b;
-            int k;
-            last_line >> d >> w >> b >> k;
-            algo_obj = new heavy_keeper_opt(d, w, b, k);
+            last_line >> hk_para.d >> hk_para.w >> hk_para.b;
         }
         else if (algo_name == "heavy_keeper_parallel")
         {
-            int d;
-            int w;
-            float b;
-            int th_cnt;
-            int k;
-            last_line >> d >> w >> b >> th_cnt >> k;
-            algo_obj = new heavy_keeper_parallel(d, w, b, th_cnt, k);
+            last_line >> hkp_para.d >> hkp_para.w >> hkp_para.b >> hkp_para.th_cnt;
         }
-        return algo_obj;
     }
 
 public:
@@ -83,17 +84,54 @@ public:
         if (plan_file.eof())
             return false;
         plan_file.getline(last_line_buf, 100);
-        while (last_line_buf[0] == '#')
+        while (last_line_buf[0] == '#' || last_line_buf[0] == '\0')
         {
             if (plan_file.eof())
                 return false;
             plan_file.getline(last_line_buf, 100);
         }
+        parse_last_line();
         return true;
     }
 
     topk_algo_base *get_bench_algo()
     {
-        return parse_last_line();
+        topk_algo_base *algo_obj;
+        if (algo_name == "exact_algo")
+        {
+            algo_obj = new exact_algo(k);
+        }
+        else if (algo_name == "count_min_heap")
+        {
+            algo_obj = new count_min_heap(cm_heap_para.d, cm_heap_para.m, k);
+        }
+        else if (algo_name == "heavy_keeper")
+        {
+            algo_obj = new heavy_keeper(hk_para.d, hk_para.w, hk_para.b, k);
+        }
+        else if (algo_name == "heavy_keeper_opt")
+        {
+            algo_obj = new heavy_keeper_opt(hk_para.d, hk_para.w, hk_para.b, k);
+        }
+        else if (algo_name == "heavy_keeper_parallel")
+        {
+            algo_obj = new heavy_keeper_parallel(hkp_para.d, hkp_para.w, hkp_para.b, hkp_para.th_cnt, k);
+        }
+        return algo_obj;
+    }
+
+    int get_cnt()
+    {
+        return read_cnt;
+    }
+
+    int get_k()
+    {
+        return k;
+    }
+
+    std::string get_last_line()
+    {
+        return std::string(last_line_buf);
     }
 };

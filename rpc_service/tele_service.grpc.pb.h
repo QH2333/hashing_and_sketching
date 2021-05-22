@@ -48,6 +48,13 @@ class tele_service final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::run_cap_response>> PrepareAsyncrun_capture(::grpc::ClientContext* context, const ::run_cap_request& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::run_cap_response>>(PrepareAsyncrun_captureRaw(context, request, cq));
     }
+    virtual ::grpc::Status stop_capture(::grpc::ClientContext* context, const ::empty_request& request, ::stop_cap_response* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::stop_cap_response>> Asyncstop_capture(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::stop_cap_response>>(Asyncstop_captureRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::stop_cap_response>> PrepareAsyncstop_capture(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::stop_cap_response>>(PrepareAsyncstop_captureRaw(context, request, cq));
+    }
     virtual ::grpc::Status get_cap_status(::grpc::ClientContext* context, const ::empty_request& request, ::get_cap_status_response* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::get_cap_status_response>> Asyncget_cap_status(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::get_cap_status_response>>(Asyncget_cap_statusRaw(context, request, cq));
@@ -77,6 +84,12 @@ class tele_service final {
       #else
       virtual void run_capture(::grpc::ClientContext* context, const ::run_cap_request* request, ::run_cap_response* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       #endif
+      virtual void stop_capture(::grpc::ClientContext* context, const ::empty_request* request, ::stop_cap_response* response, std::function<void(::grpc::Status)>) = 0;
+      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      virtual void stop_capture(::grpc::ClientContext* context, const ::empty_request* request, ::stop_cap_response* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      #else
+      virtual void stop_capture(::grpc::ClientContext* context, const ::empty_request* request, ::stop_cap_response* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      #endif
       virtual void get_cap_status(::grpc::ClientContext* context, const ::empty_request* request, ::get_cap_status_response* response, std::function<void(::grpc::Status)>) = 0;
       #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
       virtual void get_cap_status(::grpc::ClientContext* context, const ::empty_request* request, ::get_cap_status_response* response, ::grpc::ClientUnaryReactor* reactor) = 0;
@@ -102,6 +115,8 @@ class tele_service final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::getif_response>* PrepareAsyncget_if_listRaw(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::run_cap_response>* Asyncrun_captureRaw(::grpc::ClientContext* context, const ::run_cap_request& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::run_cap_response>* PrepareAsyncrun_captureRaw(::grpc::ClientContext* context, const ::run_cap_request& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::stop_cap_response>* Asyncstop_captureRaw(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::stop_cap_response>* PrepareAsyncstop_captureRaw(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::get_cap_status_response>* Asyncget_cap_statusRaw(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::get_cap_status_response>* PrepareAsyncget_cap_statusRaw(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::get_topk_result_response>* Asyncget_topk_resultRaw(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) = 0;
@@ -123,6 +138,13 @@ class tele_service final {
     }
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::run_cap_response>> PrepareAsyncrun_capture(::grpc::ClientContext* context, const ::run_cap_request& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::run_cap_response>>(PrepareAsyncrun_captureRaw(context, request, cq));
+    }
+    ::grpc::Status stop_capture(::grpc::ClientContext* context, const ::empty_request& request, ::stop_cap_response* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::stop_cap_response>> Asyncstop_capture(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::stop_cap_response>>(Asyncstop_captureRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::stop_cap_response>> PrepareAsyncstop_capture(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::stop_cap_response>>(PrepareAsyncstop_captureRaw(context, request, cq));
     }
     ::grpc::Status get_cap_status(::grpc::ClientContext* context, const ::empty_request& request, ::get_cap_status_response* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::get_cap_status_response>> Asyncget_cap_status(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) {
@@ -153,6 +175,12 @@ class tele_service final {
       #else
       void run_capture(::grpc::ClientContext* context, const ::run_cap_request* request, ::run_cap_response* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       #endif
+      void stop_capture(::grpc::ClientContext* context, const ::empty_request* request, ::stop_cap_response* response, std::function<void(::grpc::Status)>) override;
+      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      void stop_capture(::grpc::ClientContext* context, const ::empty_request* request, ::stop_cap_response* response, ::grpc::ClientUnaryReactor* reactor) override;
+      #else
+      void stop_capture(::grpc::ClientContext* context, const ::empty_request* request, ::stop_cap_response* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      #endif
       void get_cap_status(::grpc::ClientContext* context, const ::empty_request* request, ::get_cap_status_response* response, std::function<void(::grpc::Status)>) override;
       #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
       void get_cap_status(::grpc::ClientContext* context, const ::empty_request* request, ::get_cap_status_response* response, ::grpc::ClientUnaryReactor* reactor) override;
@@ -180,12 +208,15 @@ class tele_service final {
     ::grpc::ClientAsyncResponseReader< ::getif_response>* PrepareAsyncget_if_listRaw(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::run_cap_response>* Asyncrun_captureRaw(::grpc::ClientContext* context, const ::run_cap_request& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::run_cap_response>* PrepareAsyncrun_captureRaw(::grpc::ClientContext* context, const ::run_cap_request& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::stop_cap_response>* Asyncstop_captureRaw(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::stop_cap_response>* PrepareAsyncstop_captureRaw(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::get_cap_status_response>* Asyncget_cap_statusRaw(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::get_cap_status_response>* PrepareAsyncget_cap_statusRaw(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::get_topk_result_response>* Asyncget_topk_resultRaw(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::get_topk_result_response>* PrepareAsyncget_topk_resultRaw(::grpc::ClientContext* context, const ::empty_request& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_get_if_list_;
     const ::grpc::internal::RpcMethod rpcmethod_run_capture_;
+    const ::grpc::internal::RpcMethod rpcmethod_stop_capture_;
     const ::grpc::internal::RpcMethod rpcmethod_get_cap_status_;
     const ::grpc::internal::RpcMethod rpcmethod_get_topk_result_;
   };
@@ -197,6 +228,7 @@ class tele_service final {
     virtual ~Service();
     virtual ::grpc::Status get_if_list(::grpc::ServerContext* context, const ::empty_request* request, ::getif_response* response);
     virtual ::grpc::Status run_capture(::grpc::ServerContext* context, const ::run_cap_request* request, ::run_cap_response* response);
+    virtual ::grpc::Status stop_capture(::grpc::ServerContext* context, const ::empty_request* request, ::stop_cap_response* response);
     virtual ::grpc::Status get_cap_status(::grpc::ServerContext* context, const ::empty_request* request, ::get_cap_status_response* response);
     virtual ::grpc::Status get_topk_result(::grpc::ServerContext* context, const ::empty_request* request, ::get_topk_result_response* response);
   };
@@ -241,12 +273,32 @@ class tele_service final {
     }
   };
   template <class BaseClass>
+  class WithAsyncMethod_stop_capture : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_stop_capture() {
+      ::grpc::Service::MarkMethodAsync(2);
+    }
+    ~WithAsyncMethod_stop_capture() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status stop_capture(::grpc::ServerContext* /*context*/, const ::empty_request* /*request*/, ::stop_cap_response* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requeststop_capture(::grpc::ServerContext* context, ::empty_request* request, ::grpc::ServerAsyncResponseWriter< ::stop_cap_response>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
   class WithAsyncMethod_get_cap_status : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_get_cap_status() {
-      ::grpc::Service::MarkMethodAsync(2);
+      ::grpc::Service::MarkMethodAsync(3);
     }
     ~WithAsyncMethod_get_cap_status() override {
       BaseClassMustBeDerivedFromService(this);
@@ -257,7 +309,7 @@ class tele_service final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void Requestget_cap_status(::grpc::ServerContext* context, ::empty_request* request, ::grpc::ServerAsyncResponseWriter< ::get_cap_status_response>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -266,7 +318,7 @@ class tele_service final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_get_topk_result() {
-      ::grpc::Service::MarkMethodAsync(3);
+      ::grpc::Service::MarkMethodAsync(4);
     }
     ~WithAsyncMethod_get_topk_result() override {
       BaseClassMustBeDerivedFromService(this);
@@ -277,10 +329,10 @@ class tele_service final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void Requestget_topk_result(::grpc::ServerContext* context, ::empty_request* request, ::grpc::ServerAsyncResponseWriter< ::get_topk_result_response>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_get_if_list<WithAsyncMethod_run_capture<WithAsyncMethod_get_cap_status<WithAsyncMethod_get_topk_result<Service > > > > AsyncService;
+  typedef WithAsyncMethod_get_if_list<WithAsyncMethod_run_capture<WithAsyncMethod_stop_capture<WithAsyncMethod_get_cap_status<WithAsyncMethod_get_topk_result<Service > > > > > AsyncService;
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_get_if_list : public BaseClass {
    private:
@@ -376,6 +428,53 @@ class tele_service final {
       { return nullptr; }
   };
   template <class BaseClass>
+  class ExperimentalWithCallbackMethod_stop_capture : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    ExperimentalWithCallbackMethod_stop_capture() {
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      ::grpc::Service::
+    #else
+      ::grpc::Service::experimental().
+    #endif
+        MarkMethodCallback(2,
+          new ::grpc::internal::CallbackUnaryHandler< ::empty_request, ::stop_cap_response>(
+            [this](
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+                   ::grpc::CallbackServerContext*
+    #else
+                   ::grpc::experimental::CallbackServerContext*
+    #endif
+                     context, const ::empty_request* request, ::stop_cap_response* response) { return this->stop_capture(context, request, response); }));}
+    void SetMessageAllocatorFor_stop_capture(
+        ::grpc::experimental::MessageAllocator< ::empty_request, ::stop_cap_response>* allocator) {
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(2);
+    #else
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::experimental().GetHandler(2);
+    #endif
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::empty_request, ::stop_cap_response>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_stop_capture() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status stop_capture(::grpc::ServerContext* /*context*/, const ::empty_request* /*request*/, ::stop_cap_response* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+    virtual ::grpc::ServerUnaryReactor* stop_capture(
+      ::grpc::CallbackServerContext* /*context*/, const ::empty_request* /*request*/, ::stop_cap_response* /*response*/)
+    #else
+    virtual ::grpc::experimental::ServerUnaryReactor* stop_capture(
+      ::grpc::experimental::CallbackServerContext* /*context*/, const ::empty_request* /*request*/, ::stop_cap_response* /*response*/)
+    #endif
+      { return nullptr; }
+  };
+  template <class BaseClass>
   class ExperimentalWithCallbackMethod_get_cap_status : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
@@ -386,7 +485,7 @@ class tele_service final {
     #else
       ::grpc::Service::experimental().
     #endif
-        MarkMethodCallback(2,
+        MarkMethodCallback(3,
           new ::grpc::internal::CallbackUnaryHandler< ::empty_request, ::get_cap_status_response>(
             [this](
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
@@ -398,9 +497,9 @@ class tele_service final {
     void SetMessageAllocatorFor_get_cap_status(
         ::grpc::experimental::MessageAllocator< ::empty_request, ::get_cap_status_response>* allocator) {
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(2);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(3);
     #else
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::experimental().GetHandler(2);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::experimental().GetHandler(3);
     #endif
       static_cast<::grpc::internal::CallbackUnaryHandler< ::empty_request, ::get_cap_status_response>*>(handler)
               ->SetMessageAllocator(allocator);
@@ -433,7 +532,7 @@ class tele_service final {
     #else
       ::grpc::Service::experimental().
     #endif
-        MarkMethodCallback(3,
+        MarkMethodCallback(4,
           new ::grpc::internal::CallbackUnaryHandler< ::empty_request, ::get_topk_result_response>(
             [this](
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
@@ -445,9 +544,9 @@ class tele_service final {
     void SetMessageAllocatorFor_get_topk_result(
         ::grpc::experimental::MessageAllocator< ::empty_request, ::get_topk_result_response>* allocator) {
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(3);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(4);
     #else
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::experimental().GetHandler(3);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::experimental().GetHandler(4);
     #endif
       static_cast<::grpc::internal::CallbackUnaryHandler< ::empty_request, ::get_topk_result_response>*>(handler)
               ->SetMessageAllocator(allocator);
@@ -470,10 +569,10 @@ class tele_service final {
       { return nullptr; }
   };
   #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-  typedef ExperimentalWithCallbackMethod_get_if_list<ExperimentalWithCallbackMethod_run_capture<ExperimentalWithCallbackMethod_get_cap_status<ExperimentalWithCallbackMethod_get_topk_result<Service > > > > CallbackService;
+  typedef ExperimentalWithCallbackMethod_get_if_list<ExperimentalWithCallbackMethod_run_capture<ExperimentalWithCallbackMethod_stop_capture<ExperimentalWithCallbackMethod_get_cap_status<ExperimentalWithCallbackMethod_get_topk_result<Service > > > > > CallbackService;
   #endif
 
-  typedef ExperimentalWithCallbackMethod_get_if_list<ExperimentalWithCallbackMethod_run_capture<ExperimentalWithCallbackMethod_get_cap_status<ExperimentalWithCallbackMethod_get_topk_result<Service > > > > ExperimentalCallbackService;
+  typedef ExperimentalWithCallbackMethod_get_if_list<ExperimentalWithCallbackMethod_run_capture<ExperimentalWithCallbackMethod_stop_capture<ExperimentalWithCallbackMethod_get_cap_status<ExperimentalWithCallbackMethod_get_topk_result<Service > > > > > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_get_if_list : public BaseClass {
    private:
@@ -509,12 +608,29 @@ class tele_service final {
     }
   };
   template <class BaseClass>
+  class WithGenericMethod_stop_capture : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_stop_capture() {
+      ::grpc::Service::MarkMethodGeneric(2);
+    }
+    ~WithGenericMethod_stop_capture() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status stop_capture(::grpc::ServerContext* /*context*/, const ::empty_request* /*request*/, ::stop_cap_response* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
   class WithGenericMethod_get_cap_status : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_get_cap_status() {
-      ::grpc::Service::MarkMethodGeneric(2);
+      ::grpc::Service::MarkMethodGeneric(3);
     }
     ~WithGenericMethod_get_cap_status() override {
       BaseClassMustBeDerivedFromService(this);
@@ -531,7 +647,7 @@ class tele_service final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_get_topk_result() {
-      ::grpc::Service::MarkMethodGeneric(3);
+      ::grpc::Service::MarkMethodGeneric(4);
     }
     ~WithGenericMethod_get_topk_result() override {
       BaseClassMustBeDerivedFromService(this);
@@ -583,12 +699,32 @@ class tele_service final {
     }
   };
   template <class BaseClass>
+  class WithRawMethod_stop_capture : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_stop_capture() {
+      ::grpc::Service::MarkMethodRaw(2);
+    }
+    ~WithRawMethod_stop_capture() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status stop_capture(::grpc::ServerContext* /*context*/, const ::empty_request* /*request*/, ::stop_cap_response* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requeststop_capture(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
   class WithRawMethod_get_cap_status : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_get_cap_status() {
-      ::grpc::Service::MarkMethodRaw(2);
+      ::grpc::Service::MarkMethodRaw(3);
     }
     ~WithRawMethod_get_cap_status() override {
       BaseClassMustBeDerivedFromService(this);
@@ -599,7 +735,7 @@ class tele_service final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void Requestget_cap_status(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -608,7 +744,7 @@ class tele_service final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_get_topk_result() {
-      ::grpc::Service::MarkMethodRaw(3);
+      ::grpc::Service::MarkMethodRaw(4);
     }
     ~WithRawMethod_get_topk_result() override {
       BaseClassMustBeDerivedFromService(this);
@@ -619,7 +755,7 @@ class tele_service final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void Requestget_topk_result(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -699,6 +835,44 @@ class tele_service final {
       { return nullptr; }
   };
   template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_stop_capture : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    ExperimentalWithRawCallbackMethod_stop_capture() {
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      ::grpc::Service::
+    #else
+      ::grpc::Service::experimental().
+    #endif
+        MarkMethodRawCallback(2,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+                   ::grpc::CallbackServerContext*
+    #else
+                   ::grpc::experimental::CallbackServerContext*
+    #endif
+                     context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->stop_capture(context, request, response); }));
+    }
+    ~ExperimentalWithRawCallbackMethod_stop_capture() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status stop_capture(::grpc::ServerContext* /*context*/, const ::empty_request* /*request*/, ::stop_cap_response* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+    virtual ::grpc::ServerUnaryReactor* stop_capture(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)
+    #else
+    virtual ::grpc::experimental::ServerUnaryReactor* stop_capture(
+      ::grpc::experimental::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)
+    #endif
+      { return nullptr; }
+  };
+  template <class BaseClass>
   class ExperimentalWithRawCallbackMethod_get_cap_status : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
@@ -709,7 +883,7 @@ class tele_service final {
     #else
       ::grpc::Service::experimental().
     #endif
-        MarkMethodRawCallback(2,
+        MarkMethodRawCallback(3,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
@@ -747,7 +921,7 @@ class tele_service final {
     #else
       ::grpc::Service::experimental().
     #endif
-        MarkMethodRawCallback(3,
+        MarkMethodRawCallback(4,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
@@ -829,12 +1003,39 @@ class tele_service final {
     virtual ::grpc::Status Streamedrun_capture(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::run_cap_request,::run_cap_response>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
+  class WithStreamedUnaryMethod_stop_capture : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_stop_capture() {
+      ::grpc::Service::MarkMethodStreamed(2,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::empty_request, ::stop_cap_response>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::empty_request, ::stop_cap_response>* streamer) {
+                       return this->Streamedstop_capture(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_stop_capture() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status stop_capture(::grpc::ServerContext* /*context*/, const ::empty_request* /*request*/, ::stop_cap_response* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status Streamedstop_capture(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::empty_request,::stop_cap_response>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_get_cap_status : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_get_cap_status() {
-      ::grpc::Service::MarkMethodStreamed(2,
+      ::grpc::Service::MarkMethodStreamed(3,
         new ::grpc::internal::StreamedUnaryHandler<
           ::empty_request, ::get_cap_status_response>(
             [this](::grpc::ServerContext* context,
@@ -861,7 +1062,7 @@ class tele_service final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_get_topk_result() {
-      ::grpc::Service::MarkMethodStreamed(3,
+      ::grpc::Service::MarkMethodStreamed(4,
         new ::grpc::internal::StreamedUnaryHandler<
           ::empty_request, ::get_topk_result_response>(
             [this](::grpc::ServerContext* context,
@@ -882,9 +1083,9 @@ class tele_service final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status Streamedget_topk_result(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::empty_request,::get_topk_result_response>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_get_if_list<WithStreamedUnaryMethod_run_capture<WithStreamedUnaryMethod_get_cap_status<WithStreamedUnaryMethod_get_topk_result<Service > > > > StreamedUnaryService;
+  typedef WithStreamedUnaryMethod_get_if_list<WithStreamedUnaryMethod_run_capture<WithStreamedUnaryMethod_stop_capture<WithStreamedUnaryMethod_get_cap_status<WithStreamedUnaryMethod_get_topk_result<Service > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_get_if_list<WithStreamedUnaryMethod_run_capture<WithStreamedUnaryMethod_get_cap_status<WithStreamedUnaryMethod_get_topk_result<Service > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_get_if_list<WithStreamedUnaryMethod_run_capture<WithStreamedUnaryMethod_stop_capture<WithStreamedUnaryMethod_get_cap_status<WithStreamedUnaryMethod_get_topk_result<Service > > > > > StreamedService;
 };
 
 
