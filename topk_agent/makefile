@@ -11,8 +11,7 @@ compile: topk
 recompile: clean topk
 
 run:
-	./topk > result.txt
-	less result.txt
+	./topk -b
 
 topk: $(prebuilt_obj) common/common.h common/pkt_headers.h
 	g++ $(build_flags) $(prebuilt_obj) $(linked_lib) -o topk

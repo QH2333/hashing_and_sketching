@@ -322,12 +322,26 @@ void heavy_keeper_parallel::thread_handler(thread_para para)
     int th_cnt = para.th_cnt;
     uint32_t dispatcher_seed = para.dispatcher_seed;
     heavy_keeper **hk_array = para.hk_array;
-    moodycamel::BlockingConcurrentQueue<flow_id> *queue = para.queue;
+    moodycamel::ReaderWriterQueue<flow_id> *queue = para.queue;
+#ifdef READER_WRITER
+    flow_id item_to_insert;
+#else
     flow_id item_to_insert[100000];
+#endif
+    int dispatch_dst = th_id;
     while (true)
     {
+    #ifdef READER_WRITER
+        if (queue->try_dequeue(item_to_insert))
+        {
+            if (is_equal(NULL_FLOW, item_to_insert))
+            {
+                return;
+            }
+            hk_array[dispatch_dst]->insert(item_to_insert);
+        }
+    #else
         size_t dequeue_count = queue->try_dequeue_bulk(item_to_insert, 100000);
-        int dispatch_dst = th_id;
         for (int i = 0; i < dequeue_count; i++)
         {
             if (is_equal(NULL_FLOW, item_to_insert[i]))
@@ -340,27 +354,14 @@ void heavy_keeper_parallel::thread_handler(thread_para para)
             }
             hk_array[dispatch_dst]->insert(item_to_insert[i]);
         }
+    #endif
     }
-
-    // flow_id item_to_insert;
-    // while (true)
-    // {
-    //     bool is_success = queue->try_dequeue(item_to_insert);
-    //     if (is_success)
-    //     {
-    //         if (is_equal(NULL_FLOW, item_to_insert))
-    //         {
-    //             return;
-    //         }
-    //         int dispatch_dst = th_id;
-    //         // hk_array[dispatch_dst]->insert(item_to_insert);
-    //     }
-    // }
 }
 
 bool heavy_keeper_parallel::insert(const flow_id &flow_id_obj)
 {
-    queue->enqueue(flow_id_obj);
+    queue_array[curr_count % th_cnt]->enqueue(flow_id_obj);
+    // queue->enqueue(flow_id_obj);
     curr_count++;
     return true;
 }
@@ -370,7 +371,8 @@ std::vector<std::pair<flow_id, int>> heavy_keeper_parallel::query()
     stream_summary merged_result(k);
     for (int i = 0; i < th_cnt; i++)
     {
-        queue->enqueue(NULL_FLOW);
+        queue_array[i]->enqueue(NULL_FLOW);
+        // queue->enqueue(NULL_FLOW);
     }
     for (int i = 0; i < th_cnt; i++)
     {

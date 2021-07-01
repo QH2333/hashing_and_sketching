@@ -268,6 +268,8 @@ public:
     const size_t get_current_count() { return curr_count; };
 };
 
+#define READER_WRITER
+
 class heavy_keeper_parallel: public topk_algo_base
 {
 private:
@@ -279,8 +281,12 @@ private:
     uint32_t dispatcher_seed;
     heavy_keeper **hk_array;
     std::thread **thread_array;
-    size_t curr_count = 0;
+#ifdef READER_WRITER
+    moodycamel::ReaderWriterQueue<flow_id> **queue_array;
+#else
     moodycamel::BlockingConcurrentQueue<flow_id> *queue;
+#endif
+    size_t curr_count = 0;
     static std::equal_to<flow_id> is_equal;
     struct thread_para
     {
@@ -288,7 +294,11 @@ private:
         int th_cnt;
         uint32_t dispatcher_seed;
         heavy_keeper **hk_array;
+    #ifdef READER_WRITER
+        moodycamel::ReaderWriterQueue<flow_id> *queue;
+    #else
         moodycamel::BlockingConcurrentQueue<flow_id> *queue;
+    #endif
     };
 
 public:
@@ -297,13 +307,21 @@ public:
     {
         hk_array = new heavy_keeper *[th_cnt];
         thread_array = new std::thread *[th_cnt];
+    #ifdef READER_WRITER
+        queue_array = new moodycamel::ReaderWriterQueue<flow_id> *[th_cnt];
+    #else
         queue = new moodycamel::BlockingConcurrentQueue<flow_id>;
+    #endif
         dispatcher_seed = (uint32_t)rand();
         for (int i = 0; i < th_cnt; i++)
         {
-            // hk_array[i] = new heavy_keeper(d, w, b, k * 2 / th_cnt);
             hk_array[i] = new heavy_keeper(d, w, b, k);
+        #ifdef READER_WRITER
+            queue_array[i] = new moodycamel::ReaderWriterQueue<flow_id>;
+            thread_para para{i, th_cnt, dispatcher_seed, hk_array, queue_array[i]};
+        #else
             thread_para para{i, th_cnt, dispatcher_seed, hk_array, queue};
+        #endif
             thread_array[i] = new std::thread(heavy_keeper_parallel::thread_handler, para);
         }
     }
@@ -314,10 +332,17 @@ public:
         {
             delete hk_array[i];
             delete thread_array[i];
+        #ifdef READER_WRITER
+            delete queue_array[i];
+        #endif
         }
         delete[] hk_array;
         delete[] thread_array;
+    #ifdef READER_WRITER
+        delete[] queue_array;
+    #else
         delete queue;
+    #endif
     }
 
 private:
@@ -338,7 +363,8 @@ public:
     {
         for (int i = 0; i < th_cnt; i++)
         {
-            queue->enqueue(NULL_FLOW);
+            queue_array[i]->enqueue(NULL_FLOW);
+            // queue->enqueue(NULL_FLOW);
         }
         for (int i = 0; i < th_cnt; i++)
         {
